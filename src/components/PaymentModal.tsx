@@ -4,7 +4,11 @@ import {
   CreditCard, 
   Wallet, 
   DollarSign,
-  CheckCircle
+  CheckCircle,
+  Smartphone,
+  Landmark,
+  Gift,
+  Bitcoin
 } from 'lucide-react';
 import {
   Dialog,
@@ -42,6 +46,16 @@ const PaymentModal = ({
   const [cardNumber, setCardNumber] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [isComplete, setIsComplete] = useState(false);
+
+  const paymentOptions = [
+    { id: "creditCard", name: "Credit Card", icon: <CreditCard className="h-6 w-6" /> },
+    { id: "wallet", name: "E-Wallet", icon: <Wallet className="h-6 w-6" /> },
+    { id: "mobilePay", name: "Mobile Pay", icon: <Smartphone className="h-6 w-6" /> },
+    { id: "bankTransfer", name: "Bank Transfer", icon: <Landmark className="h-6 w-6" /> },
+    { id: "giftCard", name: "Gift Card", icon: <Gift className="h-6 w-6" /> },
+    { id: "crypto", name: "Cryptocurrency", icon: <Bitcoin className="h-6 w-6" /> },
+    { id: "cash", name: "Cash", icon: <DollarSign className="h-6 w-6" /> },
+  ];
 
   const handleConfirmPayment = () => {
     if (!name || !email) {
@@ -147,31 +161,22 @@ const PaymentModal = ({
                 <RadioGroup 
                   value={paymentMethod} 
                   onValueChange={setPaymentMethod}
-                  className="grid grid-cols-3 gap-4"
+                  className="grid grid-cols-4 gap-2"
                 >
-                  <div className={`flex flex-col items-center justify-center border rounded-md p-3 cursor-pointer transition-all ${paymentMethod === "creditCard" ? "border-primary bg-primary/5" : "border-input"}`}>
-                    <RadioGroupItem value="creditCard" id="creditCard" className="sr-only" />
-                    <Label htmlFor="creditCard" className="cursor-pointer flex flex-col items-center gap-2">
-                      <CreditCard className="h-6 w-6" />
-                      <span className="text-xs">Credit Card</span>
-                    </Label>
-                  </div>
-                  
-                  <div className={`flex flex-col items-center justify-center border rounded-md p-3 cursor-pointer transition-all ${paymentMethod === "wallet" ? "border-primary bg-primary/5" : "border-input"}`}>
-                    <RadioGroupItem value="wallet" id="wallet" className="sr-only" />
-                    <Label htmlFor="wallet" className="cursor-pointer flex flex-col items-center gap-2">
-                      <Wallet className="h-6 w-6" />
-                      <span className="text-xs">E-Wallet</span>
-                    </Label>
-                  </div>
-                  
-                  <div className={`flex flex-col items-center justify-center border rounded-md p-3 cursor-pointer transition-all ${paymentMethod === "cash" ? "border-primary bg-primary/5" : "border-input"}`}>
-                    <RadioGroupItem value="cash" id="cash" className="sr-only" />
-                    <Label htmlFor="cash" className="cursor-pointer flex flex-col items-center gap-2">
-                      <DollarSign className="h-6 w-6" />
-                      <span className="text-xs">Cash</span>
-                    </Label>
-                  </div>
+                  {paymentOptions.map((option) => (
+                    <div 
+                      key={option.id}
+                      className={`flex flex-col items-center justify-center border rounded-md p-2 cursor-pointer transition-all hover:bg-primary/5 ${
+                        paymentMethod === option.id ? "border-primary bg-primary/5" : "border-input"
+                      }`}
+                    >
+                      <RadioGroupItem value={option.id} id={option.id} className="sr-only" />
+                      <Label htmlFor={option.id} className="cursor-pointer flex flex-col items-center gap-1.5">
+                        {option.icon}
+                        <span className="text-xs text-center">{option.name}</span>
+                      </Label>
+                    </div>
+                  ))}
                 </RadioGroup>
               </div>
               

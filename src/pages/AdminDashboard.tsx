@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -15,7 +14,13 @@ import {
   MoreHorizontal,
   ArrowUpRight,
   Edit,
-  Trash2
+  Trash2,
+  PieChart,
+  LineChart,
+  ArrowDownUp,
+  Download,
+  Calendar,
+  Filter
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,7 +55,6 @@ import {
 import Logo from '../components/Logo';
 import { toast } from "sonner";
 
-// Demo data
 const RECENT_AUCTIONS = [
   {
     id: 'A1234',
@@ -144,9 +148,36 @@ const NOTIFICATIONS = [
   },
 ];
 
+const MONTHLY_REVENUE = [
+  { month: 'Jan', revenue: 12500 },
+  { month: 'Feb', revenue: 15000 },
+  { month: 'Mar', revenue: 18500 },
+  { month: 'Apr', revenue: 22000 },
+  { month: 'May', revenue: 19000 },
+  { month: 'Jun', revenue: 24500 },
+];
+
+const CATEGORY_DISTRIBUTION = [
+  { category: 'Collectibles', percentage: 35 },
+  { category: 'Art', percentage: 25 },
+  { category: 'Jewelry', percentage: 15 },
+  { category: 'Electronics', percentage: 12 },
+  { category: 'Vehicles', percentage: 8 },
+  { category: 'Other', percentage: 5 },
+];
+
+const TOP_BIDDERS = [
+  { id: 1, name: 'John Smith', totalBids: 47, totalAmount: 28500 },
+  { id: 2, name: 'Alice Johnson', totalBids: 38, totalAmount: 24200 },
+  { id: 3, name: 'Robert Chen', totalBids: 31, totalAmount: 19800 },
+  { id: 4, name: 'Elena Rodriguez', totalBids: 29, totalAmount: 17500 },
+  { id: 5, name: 'Michael Wong', totalBids: 23, totalAmount: 15900 },
+];
+
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [auctionSearchTerm, setAuctionSearchTerm] = useState('');
+  const [reportType, setReportType] = useState('revenue');
   
   const filteredAuctions = RECENT_AUCTIONS.filter(auction => 
     auction.title.toLowerCase().includes(auctionSearchTerm.toLowerCase()) ||
@@ -160,10 +191,13 @@ const AdminDashboard = () => {
   const handleEditAuction = (id: string) => {
     toast(`Edit auction ${id}`);
   };
+
+  const handleExportReport = (type: string) => {
+    toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} report exported successfully!`);
+  };
   
   return (
     <div className="flex min-h-screen bg-secondary/30">
-      {/* Sidebar */}
       <aside className="hidden md:flex flex-col w-64 bg-white border-r">
         <div className="p-6 border-b">
           <Logo />
@@ -234,7 +268,6 @@ const AdminDashboard = () => {
         </div>
       </aside>
       
-      {/* Main content */}
       <main className="flex-1 overflow-auto p-6">
         <div className="max-w-6xl mx-auto">
           <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
@@ -530,12 +563,261 @@ const AdminDashboard = () => {
             </TabsContent>
             
             <TabsContent value="reports">
-              <div className="flex items-center justify-center h-64 bg-white rounded-lg shadow-sm border animate-fade-in">
-                <div className="text-center">
-                  <h3 className="text-lg font-medium mb-2">Reports & Analytics</h3>
-                  <p className="text-muted-foreground mb-4">This section is under development.</p>
-                  <Button>Coming Soon</Button>
+              <div className="bg-white rounded-lg shadow-sm border p-6 animate-fade-in">
+                <div className="flex flex-col md:flex-row justify-between items-center mb-6">
+                  <h2 className="text-xl font-bold mb-4 md:mb-0">Reports & Analytics</h2>
+                  <div className="flex w-full md:w-auto gap-3">
+                    <Tabs defaultValue="revenue" value={reportType} onValueChange={setReportType} className="w-full md:w-auto">
+                      <TabsList>
+                        <TabsTrigger value="revenue" className="flex items-center gap-1.5">
+                          <LineChart className="h-4 w-4" />
+                          Revenue
+                        </TabsTrigger>
+                        <TabsTrigger value="categories" className="flex items-center gap-1.5">
+                          <PieChart className="h-4 w-4" />
+                          Categories
+                        </TabsTrigger>
+                        <TabsTrigger value="bidders" className="flex items-center gap-1.5">
+                          <Users className="h-4 w-4" />
+                          Top Bidders
+                        </TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
                 </div>
+                
+                <div className="mb-6">
+                  <div className="flex flex-wrap gap-3 mb-4">
+                    <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+                      <Calendar className="h-4 w-4" />
+                      Date Range
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex items-center gap-1.5">
+                      <Filter className="h-4 w-4" />
+                      Filters
+                    </Button>
+                    <Button variant="outline" size="sm" className="flex items-center gap-1.5" 
+                      onClick={() => handleExportReport(reportType)}>
+                      <Download className="h-4 w-4" />
+                      Export
+                    </Button>
+                  </div>
+                </div>
+                
+                {reportType === 'revenue' && (
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle>Monthly Revenue</CardTitle>
+                        <CardDescription>Revenue trends over the past 6 months</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-80 w-full bg-slate-50 rounded-md border flex items-center justify-center">
+                          <div className="w-full px-6">
+                            <div className="flex justify-between items-end h-60 border-b border-l">
+                              {MONTHLY_REVENUE.map((item, index) => (
+                                <div key={index} className="flex flex-col items-center">
+                                  <div 
+                                    className="w-12 bg-primary rounded-t-md" 
+                                    style={{ 
+                                      height: `${(item.revenue / 25000) * 100}%`,
+                                      opacity: 0.7 + (index * 0.05)
+                                    }}
+                                  ></div>
+                                  <div className="mt-2 text-xs">{item.month}</div>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex justify-between mt-4">
+                              <div className="text-sm font-medium">Total Revenue: $111,500</div>
+                              <div className="text-sm text-green-600 font-medium flex items-center">
+                                <ArrowUpRight className="h-4 w-4 mr-1" />
+                                +18.5% from previous period
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Total Revenue</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">$111,500</div>
+                          <div className="text-sm text-green-600 flex items-center mt-1">
+                            <ArrowUpRight className="h-4 w-4 mr-1" />
+                            18.5%
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Avg. Bid Value</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">$1,254</div>
+                          <div className="text-sm text-green-600 flex items-center mt-1">
+                            <ArrowUpRight className="h-4 w-4 mr-1" />
+                            12.3%
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Commission</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">$11,150</div>
+                          <div className="text-sm text-green-600 flex items-center mt-1">
+                            <ArrowUpRight className="h-4 w-4 mr-1" />
+                            18.5%
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                )}
+                
+                {reportType === 'categories' && (
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle>Category Distribution</CardTitle>
+                        <CardDescription>Distribution of auctions by category</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <div className="h-80 w-full bg-slate-50 rounded-md border flex items-center justify-center">
+                          <div className="w-full px-6 flex items-center justify-center">
+                            <div className="w-64 h-64 rounded-full border-8 border-primary relative flex items-center justify-center">
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <div className="text-center">
+                                  <div className="text-sm font-medium">Total Auctions</div>
+                                  <div className="text-2xl font-bold">145</div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="ml-12">
+                              {CATEGORY_DISTRIBUTION.map((item, index) => (
+                                <div key={index} className="flex items-center mb-3">
+                                  <div 
+                                    className="w-4 h-4 rounded-sm mr-2" 
+                                    style={{ 
+                                      backgroundColor: `hsl(${index * 60}, 70%, 60%)` 
+                                    }}
+                                  ></div>
+                                  <div className="text-sm font-medium flex-1">{item.category}</div>
+                                  <div className="text-sm font-medium ml-4">{item.percentage}%</div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Most Popular Category</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">Collectibles</div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            35% of all auctions
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Highest Bid Category</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-2xl font-bold">Jewelry</div>
+                          <div className="text-sm text-muted-foreground mt-1">
+                            Avg. bid: $3,250
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                )}
+                
+                {reportType === 'bidders' && (
+                  <div className="space-y-6">
+                    <Card>
+                      <CardHeader className="pb-2">
+                        <CardTitle>Top Bidders</CardTitle>
+                        <CardDescription>Users with the highest bidding activity</CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <Table>
+                          <TableHeader>
+                            <TableRow>
+                              <TableHead className="w-[80px]">#</TableHead>
+                              <TableHead>Name</TableHead>
+                              <TableHead>Total Bids</TableHead>
+                              <TableHead>Total Amount</TableHead>
+                              <TableHead>Avg. Per Bid</TableHead>
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {TOP_BIDDERS.map((bidder, index) => (
+                              <TableRow key={bidder.id}>
+                                <TableCell>{index + 1}</TableCell>
+                                <TableCell className="font-medium">{bidder.name}</TableCell>
+                                <TableCell>{bidder.totalBids}</TableCell>
+                                <TableCell>${bidder.totalAmount.toLocaleString()}</TableCell>
+                                <TableCell>${Math.round(bidder.totalAmount / bidder.totalBids).toLocaleString()}</TableCell>
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </CardContent>
+                    </Card>
+                    
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Total Bidders</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">254</div>
+                          <div className="text-sm text-green-600 flex items-center mt-1">
+                            <ArrowUpRight className="h-4 w-4 mr-1" />
+                            15.2%
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">Avg. Bids per User</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">3.4</div>
+                          <div className="text-sm text-green-600 flex items-center mt-1">
+                            <ArrowUpRight className="h-4 w-4 mr-1" />
+                            8.7%
+                          </div>
+                        </CardContent>
+                      </Card>
+                      <Card>
+                        <CardHeader className="pb-2">
+                          <CardTitle className="text-lg">New Bidders</CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                          <div className="text-3xl font-bold">42</div>
+                          <div className="text-sm text-green-600 flex items-center mt-1">
+                            <ArrowUpRight className="h-4 w-4 mr-1" />
+                            23.5%
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                )}
               </div>
             </TabsContent>
             
