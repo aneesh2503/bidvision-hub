@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { 
@@ -20,7 +21,10 @@ import {
   ArrowDownUp,
   Download,
   Calendar,
-  Filter
+  Filter,
+  Wallet,
+  Activity,
+  TrendingUp
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -54,6 +58,13 @@ import {
 } from "@/components/ui/tabs";
 import Logo from '../components/Logo';
 import { toast } from "sonner";
+
+// Import the dashboard components
+import StatCard from '../components/dashboard/StatCard';
+import RevenueChart from '../components/dashboard/RevenueChart';
+import CategoryDistribution from '../components/dashboard/CategoryDistribution';
+import TopBidders from '../components/dashboard/TopBidders';
+import RevenueMetrics from '../components/dashboard/RevenueMetrics';
 
 const RECENT_AUCTIONS = [
   {
@@ -104,24 +115,28 @@ const STATS = [
     value: '32',
     change: '+14%',
     increasing: true,
+    icon: Package,
   },
   {
     title: 'Total Bids',
     value: '854',
     change: '+28%',
     increasing: true,
+    icon: Activity,
   },
   {
     title: 'Revenue',
     value: '$24,500',
     change: '+18%',
     increasing: true,
+    icon: Wallet,
   },
   {
     title: 'New Users',
     value: '142',
     change: '-3%',
     increasing: false,
+    icon: Users,
   },
 ];
 
@@ -146,32 +161,6 @@ const NOTIFICATIONS = [
     title: 'Payment received for auction #A1234',
     time: '5 hours ago',
   },
-];
-
-const MONTHLY_REVENUE = [
-  { month: 'Jan', revenue: 12500 },
-  { month: 'Feb', revenue: 15000 },
-  { month: 'Mar', revenue: 18500 },
-  { month: 'Apr', revenue: 22000 },
-  { month: 'May', revenue: 19000 },
-  { month: 'Jun', revenue: 24500 },
-];
-
-const CATEGORY_DISTRIBUTION = [
-  { category: 'Collectibles', percentage: 35 },
-  { category: 'Art', percentage: 25 },
-  { category: 'Jewelry', percentage: 15 },
-  { category: 'Electronics', percentage: 12 },
-  { category: 'Vehicles', percentage: 8 },
-  { category: 'Other', percentage: 5 },
-];
-
-const TOP_BIDDERS = [
-  { id: 1, name: 'John Smith', totalBids: 47, totalAmount: 28500 },
-  { id: 2, name: 'Alice Johnson', totalBids: 38, totalAmount: 24200 },
-  { id: 3, name: 'Robert Chen', totalBids: 31, totalAmount: 19800 },
-  { id: 4, name: 'Elena Rodriguez', totalBids: 29, totalAmount: 17500 },
-  { id: 5, name: 'Michael Wong', totalBids: 23, totalAmount: 15900 },
 ];
 
 const AdminDashboard = () => {
@@ -321,19 +310,20 @@ const AdminDashboard = () => {
             <TabsContent value="overview">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {STATS.map((stat, index) => (
-                  <Card key={index} className="opacity-0 animate-fade-in" style={{ animationDelay: `${index * 100}ms` }}>
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-2xl">{stat.value}</CardTitle>
-                      <CardDescription className="flex items-center">
-                        {stat.title}
-                        <span className={`ml-2 flex items-center text-xs ${stat.increasing ? 'text-green-500' : 'text-red-500'}`}>
-                          {stat.change}
-                          <ArrowUpRight size={12} className={`ml-0.5 ${!stat.increasing ? 'rotate-180' : ''}`} />
-                        </span>
-                      </CardDescription>
-                    </CardHeader>
-                  </Card>
+                  <StatCard 
+                    key={index}
+                    title={stat.title}
+                    value={stat.value}
+                    change={stat.change}
+                    increasing={stat.increasing}
+                    icon={stat.icon}
+                    delay={index * 100}
+                  />
                 ))}
+              </div>
+              
+              <div className="mb-8">
+                <RevenueChart />
               </div>
               
               <Card className="mb-8 opacity-0 animate-scale-in" style={{ animationDelay: `400ms` }}>
@@ -605,118 +595,12 @@ const AdminDashboard = () => {
                 </div>
                 
                 {reportType === 'revenue' && (
-                  <div className="space-y-6">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle>Monthly Revenue</CardTitle>
-                        <CardDescription>Revenue trends over the past 6 months</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-80 w-full bg-slate-50 rounded-md border flex items-center justify-center">
-                          <div className="w-full px-6">
-                            <div className="flex justify-between items-end h-60 border-b border-l">
-                              {MONTHLY_REVENUE.map((item, index) => (
-                                <div key={index} className="flex flex-col items-center">
-                                  <div 
-                                    className="w-12 bg-primary rounded-t-md" 
-                                    style={{ 
-                                      height: `${(item.revenue / 25000) * 100}%`,
-                                      opacity: 0.7 + (index * 0.05)
-                                    }}
-                                  ></div>
-                                  <div className="mt-2 text-xs">{item.month}</div>
-                                </div>
-                              ))}
-                            </div>
-                            <div className="flex justify-between mt-4">
-                              <div className="text-sm font-medium">Total Revenue: $111,500</div>
-                              <div className="text-sm text-green-600 font-medium flex items-center">
-                                <ArrowUpRight className="h-4 w-4 mr-1" />
-                                +18.5% from previous period
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg">Total Revenue</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold">$111,500</div>
-                          <div className="text-sm text-green-600 flex items-center mt-1">
-                            <ArrowUpRight className="h-4 w-4 mr-1" />
-                            18.5%
-                          </div>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg">Avg. Bid Value</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold">$1,254</div>
-                          <div className="text-sm text-green-600 flex items-center mt-1">
-                            <ArrowUpRight className="h-4 w-4 mr-1" />
-                            12.3%
-                          </div>
-                        </CardContent>
-                      </Card>
-                      <Card>
-                        <CardHeader className="pb-2">
-                          <CardTitle className="text-lg">Commission</CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="text-3xl font-bold">$11,150</div>
-                          <div className="text-sm text-green-600 flex items-center mt-1">
-                            <ArrowUpRight className="h-4 w-4 mr-1" />
-                            18.5%
-                          </div>
-                        </CardContent>
-                      </Card>
-                    </div>
-                  </div>
+                  <RevenueMetrics />
                 )}
                 
                 {reportType === 'categories' && (
                   <div className="space-y-6">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle>Category Distribution</CardTitle>
-                        <CardDescription>Distribution of auctions by category</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <div className="h-80 w-full bg-slate-50 rounded-md border flex items-center justify-center">
-                          <div className="w-full px-6 flex items-center justify-center">
-                            <div className="w-64 h-64 rounded-full border-8 border-primary relative flex items-center justify-center">
-                              <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="text-center">
-                                  <div className="text-sm font-medium">Total Auctions</div>
-                                  <div className="text-2xl font-bold">145</div>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="ml-12">
-                              {CATEGORY_DISTRIBUTION.map((item, index) => (
-                                <div key={index} className="flex items-center mb-3">
-                                  <div 
-                                    className="w-4 h-4 rounded-sm mr-2" 
-                                    style={{ 
-                                      backgroundColor: `hsl(${index * 60}, 70%, 60%)` 
-                                    }}
-                                  ></div>
-                                  <div className="text-sm font-medium flex-1">{item.category}</div>
-                                  <div className="text-sm font-medium ml-4">{item.percentage}%</div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
+                    <CategoryDistribution />
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <Card>
@@ -747,36 +631,7 @@ const AdminDashboard = () => {
                 
                 {reportType === 'bidders' && (
                   <div className="space-y-6">
-                    <Card>
-                      <CardHeader className="pb-2">
-                        <CardTitle>Top Bidders</CardTitle>
-                        <CardDescription>Users with the highest bidding activity</CardDescription>
-                      </CardHeader>
-                      <CardContent>
-                        <Table>
-                          <TableHeader>
-                            <TableRow>
-                              <TableHead className="w-[80px]">#</TableHead>
-                              <TableHead>Name</TableHead>
-                              <TableHead>Total Bids</TableHead>
-                              <TableHead>Total Amount</TableHead>
-                              <TableHead>Avg. Per Bid</TableHead>
-                            </TableRow>
-                          </TableHeader>
-                          <TableBody>
-                            {TOP_BIDDERS.map((bidder, index) => (
-                              <TableRow key={bidder.id}>
-                                <TableCell>{index + 1}</TableCell>
-                                <TableCell className="font-medium">{bidder.name}</TableCell>
-                                <TableCell>{bidder.totalBids}</TableCell>
-                                <TableCell>${bidder.totalAmount.toLocaleString()}</TableCell>
-                                <TableCell>${Math.round(bidder.totalAmount / bidder.totalBids).toLocaleString()}</TableCell>
-                              </TableRow>
-                            ))}
-                          </TableBody>
-                        </Table>
-                      </CardContent>
-                    </Card>
+                    <TopBidders />
                     
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <Card>
