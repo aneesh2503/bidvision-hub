@@ -3,7 +3,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
-import { ClipboardList } from 'lucide-react';
+import { ClipboardList, LayoutDashboard } from 'lucide-react';
 
 const Navbar = () => {
   return (
@@ -17,8 +17,9 @@ const Navbar = () => {
             <span className="hidden sm:inline">Logs</span>
           </Link>
           <Link to="/admin">
-            <Button variant="outline" size="sm">
-              Admin
+            <Button variant="secondary" size="sm" className="flex items-center gap-1.5">
+              <LayoutDashboard className="h-4 w-4" />
+              <span>Admin Dashboard</span>
             </Button>
           </Link>
           <Button size="sm">Sign In</Button>
