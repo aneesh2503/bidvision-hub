@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from 'react';
-import { Heart, Clock, AlertCircle } from 'lucide-react';
+import { Heart, Clock, AlertCircle, HandCoins } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { 
   Card, 
@@ -47,7 +47,10 @@ const AuctionCard = ({
     }
   }, [id]);
   
-  const handleLike = () => {
+  const handleLike = (e: React.MouseEvent) => {
+    // Prevent click from propagating to the card
+    e.stopPropagation();
+    
     const newLikedState = !liked;
     setLiked(newLikedState);
     
@@ -72,7 +75,11 @@ const AuctionCard = ({
     localStorage.setItem('favorites', JSON.stringify(favorites));
   };
   
-  const handleBid = () => {
+  const handleBid = (e?: React.MouseEvent) => {
+    // If e exists, prevent default behavior
+    if (e) {
+      e.stopPropagation();
+    }
     setShowPaymentModal(true);
   };
   
@@ -83,7 +90,10 @@ const AuctionCard = ({
   
   return (
     <>
-      <Card className={`overflow-hidden auction-card-scale ${className}`}>
+      <Card 
+        className={`overflow-hidden auction-card-scale ${className} cursor-pointer transition-all hover:shadow-md`}
+        onClick={() => handleBid()}
+      >
         <div className="relative">
           <img 
             src={image} 
@@ -94,7 +104,7 @@ const AuctionCard = ({
             onClick={handleLike}
             className={`absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm
               ${liked ? 'text-red-500' : 'text-gray-600'} 
-              transition-colors hover:bg-white`}
+              transition-colors hover:bg-white z-10`}
           >
             <Heart className={`h-5 w-5 ${liked ? 'fill-red-500' : ''}`} />
           </button>
@@ -130,6 +140,7 @@ const AuctionCard = ({
         
         <CardFooter className="pt-0">
           <Button className="w-full" onClick={handleBid}>
+            <HandCoins className="mr-2" />
             Place Bid (${bidAmount.toLocaleString()})
           </Button>
         </CardFooter>
