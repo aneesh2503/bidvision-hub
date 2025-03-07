@@ -6,9 +6,9 @@ import PaymentModal from '@/components/PaymentModal';
 import { useState } from 'react';
 import { toast } from "sonner";
 
-// This would typically come from an API
-const AUCTION_ITEMS = {
-  '1': {
+// Import the auction items data from AuctionGrid to ensure consistency
+const AUCTION_ITEMS = [
+  {
     id: '1',
     title: 'Vintage Rolex Submariner',
     description: 'Authentic 1970 Rolex Submariner in excellent condition with original box and papers. This timepiece features a classic black dial with luminous hour markers, a rotatable bezel, and is powered by an automatic movement. The watch has been professionally serviced and maintains excellent timekeeping accuracy. Includes original documentation, box, and service history.',
@@ -16,14 +16,89 @@ const AUCTION_ITEMS = {
     currentBid: 8500,
     timeLeft: '2d 5h 20m',
     bids: 23,
+    category: 'watches',
     condition: 'Excellent',
     startingPrice: 5000,
     seller: 'Luxury Timepieces Ltd',
     location: 'Geneva, Switzerland',
     history: '3 previous owners, Full service history'
   },
-  // ... Add other items as needed
-};
+  {
+    id: '2',
+    title: 'Modern Art Painting',
+    description: 'Original abstract painting by contemporary artist Jane Doe, acrylic on canvas.',
+    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
+    currentBid: 3200,
+    timeLeft: '6h 45m',
+    bids: 15,
+    category: 'art',
+    condition: 'New',
+    startingPrice: 2000,
+    seller: 'Modern Art Gallery',
+    location: 'New York, USA',
+    history: 'Original creation, first auction'
+  },
+  {
+    id: '3',
+    title: 'Antique Writing Desk',
+    description: 'Early 19th century mahogany writing desk with inlaid leather top and brass hardware.',
+    image: 'https://images.unsplash.com/photo-1517705600644-3f68b9b15627?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
+    currentBid: 4500,
+    timeLeft: '1d 12h',
+    bids: 8,
+    category: 'furniture',
+    condition: 'Good',
+    startingPrice: 3000,
+    seller: 'Antique Treasures',
+    location: 'London, UK',
+    history: 'Belonged to a Victorian-era writer'
+  },
+  {
+    id: '4',
+    title: 'First Edition Book Collection',
+    description: 'Set of five first edition novels by Ernest Hemingway, all in pristine condition.',
+    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
+    currentBid: 6200,
+    timeLeft: '3d 8h',
+    bids: 12,
+    category: 'collectibles',
+    condition: 'Excellent',
+    startingPrice: 4000,
+    seller: 'Rare Books Collector',
+    location: 'Boston, USA',
+    history: 'Preserved in climate-controlled environment'
+  },
+  {
+    id: '5',
+    title: 'Vintage Camera Collection',
+    description: 'Collection of five film cameras from the 1950s-1970s, including Leica, Rolleiflex, and Nikon.',
+    image: 'https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
+    currentBid: 2800,
+    timeLeft: '5h 20m',
+    bids: 18,
+    category: 'electronics',
+    condition: 'Good',
+    startingPrice: 1500,
+    seller: 'Vintage Tech',
+    location: 'Berlin, Germany',
+    history: 'From a professional photographer's estate'
+  },
+  {
+    id: '6',
+    title: 'Designer Handbag',
+    description: 'Limited edition designer handbag in perfect condition, comes with authentication card.',
+    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
+    currentBid: 1950,
+    timeLeft: '2d 3h',
+    bids: 7,
+    category: 'fashion',
+    condition: 'Like New',
+    startingPrice: 1200,
+    seller: 'Luxury Reseller',
+    location: 'Paris, France',
+    history: 'Limited edition, one of only 500 made'
+  },
+];
 
 const AuctionDetails = () => {
   const { id } = useParams();
@@ -31,7 +106,8 @@ const AuctionDetails = () => {
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [bidAmount, setBidAmount] = useState(0);
   
-  const item = AUCTION_ITEMS[id as keyof typeof AUCTION_ITEMS];
+  // Find the auction item by ID
+  const item = AUCTION_ITEMS.find(item => item.id === id);
   
   if (!item) {
     return (
