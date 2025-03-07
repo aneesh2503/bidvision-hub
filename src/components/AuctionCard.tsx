@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Heart, Clock, AlertCircle } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { 
@@ -38,13 +38,38 @@ const AuctionCard = ({
   const [bidAmount, setBidAmount] = useState(currentBid + 50);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   
-  const handleLike = () => {
-    setLiked(!liked);
-    if (!liked) {
-      toast.success("Added to favorites");
-    } else {
-      toast("Removed from favorites");
+  // Check if the item is in favorites when component mounts
+  useEffect(() => {
+    const savedFavorites = localStorage.getItem('favorites');
+    if (savedFavorites) {
+      const parsedFavorites = JSON.parse(savedFavorites);
+      setLiked(parsedFavorites.includes(id));
     }
+  }, [id]);
+  
+  const handleLike = () => {
+    const newLikedState = !liked;
+    setLiked(newLikedState);
+    
+    // Update localStorage
+    const savedFavorites = localStorage.getItem('favorites');
+    const favorites = savedFavorites ? JSON.parse(savedFavorites) : [];
+    
+    if (newLikedState) {
+      // Add to favorites
+      if (!favorites.includes(id)) {
+        favorites.push(id);
+        toast.success("Added to favorites");
+      }
+    } else {
+      // Remove from favorites
+      const updatedFavorites = favorites.filter((itemId: string) => itemId !== id);
+      toast("Removed from favorites");
+      localStorage.setItem('favorites', JSON.stringify(updatedFavorites));
+      return;
+    }
+    
+    localStorage.setItem('favorites', JSON.stringify(favorites));
   };
   
   const handleBid = () => {
