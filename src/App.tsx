@@ -9,6 +9,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import LogViewer from "./pages/LogViewer";
 import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
+import AuctionDetails from "./pages/AuctionDetails";
 
 const queryClient = new QueryClient();
 
@@ -20,10 +21,10 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/auction/:id" element={<AuctionDetails />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/logs" element={<LogViewer />} />
           <Route path="/favorites" element={<Favorites />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
