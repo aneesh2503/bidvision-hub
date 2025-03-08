@@ -10,17 +10,27 @@ import { Info } from 'lucide-react';
 
 interface DashboardTooltipProps {
   content: string;
+  icon?: React.ReactNode;
+  side?: "top" | "right" | "bottom" | "left";
+  align?: "start" | "center" | "end";
 }
 
-const DashboardTooltip = ({ content }: DashboardTooltipProps) => {
+const DashboardTooltip = ({ 
+  content, 
+  icon = <Info className="h-4 w-4 text-muted-foreground cursor-help" />,
+  side = "top",
+  align = "center"
+}: DashboardTooltipProps) => {
   return (
     <TooltipProvider>
-      <Tooltip>
+      <Tooltip delayDuration={200}>
         <TooltipTrigger asChild>
-          <Info className="h-4 w-4 ml-1 text-muted-foreground cursor-help" />
+          <span className="ml-1 inline-flex items-center cursor-help">
+            {icon}
+          </span>
         </TooltipTrigger>
-        <TooltipContent>
-          <p className="max-w-xs">{content}</p>
+        <TooltipContent side={side} align={align} className="bg-popover/95 backdrop-blur-sm border-border/40">
+          <p className="max-w-xs text-sm">{content}</p>
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
