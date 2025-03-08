@@ -58,6 +58,11 @@ import {
 import Logo from '../components/Logo';
 import { toast } from "sonner";
 import { adminAuthService } from '@/services/adminAuthService';
+import StatCard from '@/components/dashboard/StatCard';
+import RevenueChart from '@/components/dashboard/RevenueChart';
+import RevenueMetrics from '@/components/dashboard/RevenueMetrics';
+import CategoryDistribution from '@/components/dashboard/CategoryDistribution';
+import TopBidders from '@/components/dashboard/TopBidders';
 
 const RECENT_AUCTIONS = [
   {
