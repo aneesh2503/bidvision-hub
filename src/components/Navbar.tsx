@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import Logo from './Logo';
-import { ClipboardList, LayoutDashboard, Heart, User } from 'lucide-react';
+import { ClipboardList, Shield, Heart, User, LogOut } from 'lucide-react';
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -11,14 +11,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { authService } from '@/services/authService';
+import { adminAuthService } from '@/services/adminAuthService';
 import { toast } from "sonner";
 
 const Navbar = () => {
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [isAdminSignedIn, setIsAdminSignedIn] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Check if user is already signed in
     setIsSignedIn(authService.isAuthenticated());
+    setIsAdminSignedIn(adminAuthService.isAdminAuthenticated());
   }, []);
 
   const handleSignIn = (provider: string) => {
@@ -37,6 +41,13 @@ const Navbar = () => {
     toast.info("Signed out successfully");
   };
 
+  const handleAdminLogout = () => {
+    adminAuthService.adminLogout();
+    setIsAdminSignedIn(false);
+    toast.info("Admin signed out successfully");
+    navigate('/');
+  };
+
   return (
     <header className="border-b border-border sticky top-0 bg-background/80 backdrop-blur-md z-10">
       <nav className="container mx-auto px-4 py-3 flex justify-between items-center">
@@ -53,12 +64,33 @@ const Navbar = () => {
             <span className="hidden sm:inline">Favorites</span>
           </Link>
           
-          <Link to="/admin">
-            <Button variant="secondary" size="sm" className="flex items-center gap-1.5">
-              <LayoutDashboard className="h-4 w-4" />
-              <span>Admin Dashboard</span>
+          {isAdminSignedIn ? (
+            <Link to="/admin">
+              <Button variant="secondary" size="sm" className="flex items-center gap-1.5">
+                <Shield className="h-4 w-4" />
+                <span>Admin Dashboard</span>
+              </Button>
+            </Link>
+          ) : (
+            <Link to="/admin-login">
+              <Button variant="secondary" size="sm" className="flex items-center gap-1.5">
+                <Shield className="h-4 w-4" />
+                <span>Admin Login</span>
+              </Button>
+            </Link>
+          )}
+          
+          {isAdminSignedIn && (
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={handleAdminLogout}
+              className="flex items-center gap-1.5"
+            >
+              <LogOut className="h-4 w-4" />
+              <span className="hidden sm:inline">Admin Logout</span>
             </Button>
-          </Link>
+          )}
           
           {isSignedIn ? (
             <DropdownMenu>

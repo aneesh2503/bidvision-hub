@@ -1,6 +1,5 @@
-
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { 
   LayoutDashboard, 
   Package, 
@@ -58,13 +57,7 @@ import {
 } from "@/components/ui/tabs";
 import Logo from '../components/Logo';
 import { toast } from "sonner";
-
-// Import the dashboard components
-import StatCard from '../components/dashboard/StatCard';
-import RevenueChart from '../components/dashboard/RevenueChart';
-import CategoryDistribution from '../components/dashboard/CategoryDistribution';
-import TopBidders from '../components/dashboard/TopBidders';
-import RevenueMetrics from '../components/dashboard/RevenueMetrics';
+import { adminAuthService } from '@/services/adminAuthService';
 
 const RECENT_AUCTIONS = [
   {
@@ -167,6 +160,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [auctionSearchTerm, setAuctionSearchTerm] = useState('');
   const [reportType, setReportType] = useState('revenue');
+  const navigate = useNavigate();
   
   const filteredAuctions = RECENT_AUCTIONS.filter(auction => 
     auction.title.toLowerCase().includes(auctionSearchTerm.toLowerCase()) ||
@@ -183,6 +177,12 @@ const AdminDashboard = () => {
 
   const handleExportReport = (type: string) => {
     toast.success(`${type.charAt(0).toUpperCase() + type.slice(1)} report exported successfully!`);
+  };
+  
+  const handleAdminLogout = () => {
+    adminAuthService.adminLogout();
+    toast.success('Logged out successfully');
+    navigate('/admin-login');
   };
   
   return (
@@ -248,9 +248,13 @@ const AdminDashboard = () => {
         </nav>
         
         <div className="p-4 border-t mt-auto">
+          <Button variant="outline" className="w-full mb-2" onClick={handleAdminLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            Logout
+          </Button>
           <Link to="/">
             <Button variant="outline" className="w-full">
-              <LogOut className="mr-2 h-4 w-4" />
+              <LayoutDashboard className="mr-2 h-4 w-4" />
               Back to Site
             </Button>
           </Link>
