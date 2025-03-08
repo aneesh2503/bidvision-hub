@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Search, Filter, Clock, CheckCircle2 } from 'lucide-react';
+import { Search, Filter, Clock, CheckCircle2, Star, Sparkles, Flame } from 'lucide-react';
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -17,73 +17,46 @@ import {
   TabsTrigger,
 } from "@/components/ui/tabs";
 import AuctionCard from './AuctionCard';
-
-const AUCTION_ITEMS = [
-  {
-    id: '1',
-    title: 'Vintage Rolex Submariner',
-    description: 'Authentic 1970 Rolex Submariner in excellent condition with original box and papers.',
-    image: 'https://images.unsplash.com/photo-1523170335258-f5ed11844a49?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
-    currentBid: 8500,
-    timeLeft: '2d 5h 20m',
-    bids: 23,
-    category: 'watches',
-  },
-  {
-    id: '2',
-    title: 'Modern Art Painting',
-    description: 'Original abstract painting by contemporary artist Jane Doe, acrylic on canvas.',
-    image: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
-    currentBid: 3200,
-    timeLeft: '6h 45m',
-    bids: 15,
-    category: 'art',
-  },
-  {
-    id: '3',
-    title: 'Antique Writing Desk',
-    description: 'Early 19th century mahogany writing desk with inlaid leather top and brass hardware.',
-    image: 'https://images.unsplash.com/photo-1517705600644-3f68b9b15627?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
-    currentBid: 4500,
-    timeLeft: '1d 12h',
-    bids: 8,
-    category: 'furniture',
-  },
-  {
-    id: '4',
-    title: 'First Edition Book Collection',
-    description: 'Set of five first edition novels by Ernest Hemingway, all in pristine condition.',
-    image: 'https://images.unsplash.com/photo-1512820790803-83ca734da794?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
-    currentBid: 6200,
-    timeLeft: '3d 8h',
-    bids: 12,
-    category: 'collectibles',
-  },
-  {
-    id: '5',
-    title: 'Vintage Camera Collection',
-    description: 'Collection of five film cameras from the 1950s-1970s, including Leica, Rolleiflex, and Nikon.',
-    image: 'https://images.unsplash.com/photo-1452780212940-6f5c0d14d848?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
-    currentBid: 2800,
-    timeLeft: '5h 20m',
-    bids: 18,
-    category: 'electronics',
-  },
-  {
-    id: '6',
-    title: 'Designer Handbag',
-    description: 'Limited edition designer handbag in perfect condition, comes with authentication card.',
-    image: 'https://images.unsplash.com/photo-1584917865442-de89df76afd3?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1180&q=80',
-    currentBid: 1950,
-    timeLeft: '2d 3h',
-    bids: 7,
-    category: 'fashion',
-  },
-];
+import { auctionItems } from '@/data/auctionItems';
 
 const AuctionGrid = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [filterVisible, setFilterVisible] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('all');
+  const [priceFilter, setPriceFilter] = useState('all');
+  const [conditionFilter, setConditionFilter] = useState('all');
+  
+  // Apply filters to auction items
+  const filteredItems = auctionItems.filter(item => {
+    // Search filter
+    const matchesSearch = 
+      item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      item.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    // Category filter
+    const matchesCategory = categoryFilter === 'all' || item.category === categoryFilter;
+    
+    // Price filter
+    const matchesPrice = (() => {
+      if (priceFilter === 'all') return true;
+      if (priceFilter === '0-1000' && item.currentBid < 1000) return true;
+      if (priceFilter === '1000-5000' && item.currentBid >= 1000 && item.currentBid < 5000) return true;
+      if (priceFilter === '5000-10000' && item.currentBid >= 5000 && item.currentBid < 10000) return true;
+      if (priceFilter === '10000+' && item.currentBid >= 10000) return true;
+      return false;
+    })();
+    
+    // Condition filter
+    const matchesCondition = conditionFilter === 'all' || item.condition === conditionFilter;
+    
+    return matchesSearch && matchesCategory && matchesPrice && matchesCondition;
+  });
+  
+  const resetFilters = () => {
+    setCategoryFilter('all');
+    setPriceFilter('all');
+    setConditionFilter('all');
+  };
   
   return (
     <section className="py-20" id="auctions">
@@ -108,7 +81,7 @@ const AuctionGrid = () => {
               />
             </div>
             <Button 
-              variant="outline" 
+              variant={filterVisible ? "secondary" : "outline"}
               onClick={() => setFilterVisible(!filterVisible)}
               className="md:w-auto w-full"
             >
@@ -130,11 +103,11 @@ const AuctionGrid = () => {
           </div>
           
           {filterVisible && (
-            <div className="bg-secondary p-4 rounded-lg mb-6 animate-fade-in">
+            <div className="bg-secondary/60 backdrop-blur-sm p-4 rounded-lg mb-6 animate-fade-in border border-border/50">
               <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                 <div>
                   <label className="text-sm font-medium block mb-2">Category</label>
-                  <Select defaultValue="all">
+                  <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
@@ -145,13 +118,16 @@ const AuctionGrid = () => {
                       <SelectItem value="electronics">Electronics</SelectItem>
                       <SelectItem value="fashion">Fashion</SelectItem>
                       <SelectItem value="furniture">Furniture</SelectItem>
+                      <SelectItem value="jewelry">Jewelry</SelectItem>
                       <SelectItem value="watches">Watches</SelectItem>
+                      <SelectItem value="vehicles">Vehicles</SelectItem>
+                      <SelectItem value="antiquities">Antiquities</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
                 <div>
                   <label className="text-sm font-medium block mb-2">Price Range</label>
-                  <Select defaultValue="all">
+                  <Select value={priceFilter} onValueChange={setPriceFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select price range" />
                     </SelectTrigger>
@@ -166,7 +142,7 @@ const AuctionGrid = () => {
                 </div>
                 <div>
                   <label className="text-sm font-medium block mb-2">Item Condition</label>
-                  <Select defaultValue="all">
+                  <Select value={conditionFilter} onValueChange={setConditionFilter}>
                     <SelectTrigger>
                       <SelectValue placeholder="Select condition" />
                     </SelectTrigger>
@@ -180,26 +156,10 @@ const AuctionGrid = () => {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <label className="text-sm font-medium block mb-2">Location</label>
-                  <Select defaultValue="all">
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select location" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Locations</SelectItem>
-                      <SelectItem value="north-america">North America</SelectItem>
-                      <SelectItem value="europe">Europe</SelectItem>
-                      <SelectItem value="asia">Asia</SelectItem>
-                      <SelectItem value="australia">Australia</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="flex items-end">
+                  <Button variant="outline" size="sm" className="mr-2" onClick={resetFilters}>Reset</Button>
+                  <Button size="sm">Apply Filters</Button>
                 </div>
-              </div>
-              <div className="flex justify-end mt-4">
-                <Button variant="outline" size="sm" className="mr-2">Reset</Button>
-                <Button size="sm">Apply Filters</Button>
               </div>
             </div>
           )}
@@ -210,7 +170,12 @@ const AuctionGrid = () => {
               <TabsTrigger value="ending-soon" className="flex items-center">
                 <Clock className="mr-1 h-3 w-3" /> Ending Soon
               </TabsTrigger>
-              <TabsTrigger value="new-arrivals">New Arrivals</TabsTrigger>
+              <TabsTrigger value="new-arrivals" className="flex items-center">
+                <Sparkles className="mr-1 h-3 w-3" /> New Arrivals
+              </TabsTrigger>
+              <TabsTrigger value="trending" className="flex items-center">
+                <Flame className="mr-1 h-3 w-3" /> Trending
+              </TabsTrigger>
               <TabsTrigger value="verified" className="flex items-center">
                 <CheckCircle2 className="mr-1 h-3 w-3" /> Verified Only
               </TabsTrigger>
@@ -218,10 +183,7 @@ const AuctionGrid = () => {
             
             <TabsContent value="all" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {AUCTION_ITEMS.filter(item => 
-                  item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                  item.description.toLowerCase().includes(searchTerm.toLowerCase())
-                ).map((auction, index) => (
+                {filteredItems.map((auction, index) => (
                   <AuctionCard 
                     key={auction.id} 
                     {...auction} 
@@ -233,8 +195,9 @@ const AuctionGrid = () => {
             
             <TabsContent value="ending-soon" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {AUCTION_ITEMS.filter(item => 
-                  item.timeLeft.includes('h') && !item.timeLeft.includes('d')
+                {filteredItems.filter(item => 
+                  item.timeLeft.includes('hours') || 
+                  (item.timeLeft.includes('day') && !item.timeLeft.includes('days'))
                 ).map((auction, index) => (
                   <AuctionCard 
                     key={auction.id} 
@@ -247,7 +210,19 @@ const AuctionGrid = () => {
             
             <TabsContent value="new-arrivals" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {AUCTION_ITEMS.slice(3, 6).map((auction, index) => (
+                {filteredItems.slice(6, 12).map((auction, index) => (
+                  <AuctionCard 
+                    key={auction.id} 
+                    {...auction} 
+                    className={`opacity-0 animate-fade-in animate-delay-${(index % 3) + 1}00`}
+                  />
+                ))}
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="trending" className="mt-0">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {filteredItems.filter(item => item.bids > 20).map((auction, index) => (
                   <AuctionCard 
                     key={auction.id} 
                     {...auction} 
@@ -259,7 +234,7 @@ const AuctionGrid = () => {
             
             <TabsContent value="verified" className="mt-0">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {AUCTION_ITEMS.filter((_, index) => index % 2 === 0).map((auction, index) => (
+                {filteredItems.filter((_, index) => index % 2 === 0).map((auction, index) => (
                   <AuctionCard 
                     key={auction.id} 
                     {...auction} 
