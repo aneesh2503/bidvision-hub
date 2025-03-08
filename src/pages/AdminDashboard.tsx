@@ -23,7 +23,11 @@ import {
   Filter,
   Wallet,
   Activity,
-  TrendingUp
+  TrendingUp,
+  Home,
+  HelpCircle,
+  Moon,
+  Sun
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,6 +59,13 @@ import {
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import Logo from '../components/Logo';
 import { toast } from "sonner";
 import { adminAuthService } from '@/services/adminAuthService';
@@ -63,6 +74,9 @@ import RevenueChart from '@/components/dashboard/RevenueChart';
 import RevenueMetrics from '@/components/dashboard/RevenueMetrics';
 import CategoryDistribution from '@/components/dashboard/CategoryDistribution';
 import TopBidders from '@/components/dashboard/TopBidders';
+import DashboardTooltip from '@/components/dashboard/DashboardTooltip';
+import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
+import QuickActions from '@/components/dashboard/QuickActions';
 
 const RECENT_AUCTIONS = [
   {
@@ -165,6 +179,7 @@ const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState('overview');
   const [auctionSearchTerm, setAuctionSearchTerm] = useState('');
   const [reportType, setReportType] = useState('revenue');
+  const [darkMode, setDarkMode] = useState(false);
   const navigate = useNavigate();
   
   const filteredAuctions = RECENT_AUCTIONS.filter(auction => 
@@ -189,77 +204,131 @@ const AdminDashboard = () => {
     toast.success('Logged out successfully');
     navigate('/admin-login');
   };
+
+  const toggleDarkMode = () => {
+    setDarkMode(!darkMode);
+    document.documentElement.classList.toggle('dark');
+    toast.success(`${darkMode ? 'Light' : 'Dark'} mode activated`);
+  };
   
   return (
-    <div className="flex min-h-screen bg-secondary/30">
-      <aside className="hidden md:flex flex-col w-64 bg-white border-r">
-        <div className="p-6 border-b">
+    <div className={`flex min-h-screen ${darkMode ? 'dark' : ''} bg-secondary/30 dark:bg-gray-900`}>
+      <aside className="hidden md:flex flex-col w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700">
+        <div className="p-6 border-b dark:border-gray-700">
           <Logo />
         </div>
         
-        <nav className="flex-1 py-6 px-4">
-          <ul className="space-y-1">
-            <li>
-              <Button 
-                variant="ghost"
-                className={`w-full justify-start ${activeTab === 'overview' ? 'bg-secondary' : ''}`}
-                onClick={() => setActiveTab('overview')}
-              >
-                <LayoutDashboard className="mr-2 h-5 w-5" />
-                Overview
-              </Button>
-            </li>
-            <li>
-              <Button 
-                variant="ghost"
-                className={`w-full justify-start ${activeTab === 'auctions' ? 'bg-secondary' : ''}`}
-                onClick={() => setActiveTab('auctions')}
-              >
-                <Package className="mr-2 h-5 w-5" />
-                Auctions
-              </Button>
-            </li>
-            <li>
-              <Button 
-                variant="ghost"
-                className={`w-full justify-start ${activeTab === 'users' ? 'bg-secondary' : ''}`}
-                onClick={() => setActiveTab('users')}
-              >
-                <Users className="mr-2 h-5 w-5" />
-                Users
-              </Button>
-            </li>
-            <li>
-              <Button 
-                variant="ghost"
-                className={`w-full justify-start ${activeTab === 'reports' ? 'bg-secondary' : ''}`}
-                onClick={() => setActiveTab('reports')}
-              >
-                <BarChart className="mr-2 h-5 w-5" />
-                Reports
-              </Button>
-            </li>
-            <li>
-              <Button 
-                variant="ghost"
-                className={`w-full justify-start ${activeTab === 'settings' ? 'bg-secondary' : ''}`}
-                onClick={() => setActiveTab('settings')}
-              >
-                <Settings className="mr-2 h-5 w-5" />
-                Settings
-              </Button>
-            </li>
-          </ul>
+        <nav className="flex-1 py-6 px-4 overflow-y-auto">
+          <div className="mb-6">
+            <p className="text-xs font-semibold text-muted-foreground mb-2 px-2">MAIN MENU</p>
+            <ul className="space-y-1">
+              <li>
+                <Button 
+                  variant="ghost"
+                  className={`w-full justify-start ${activeTab === 'overview' ? 'bg-secondary dark:bg-gray-700' : ''}`}
+                  onClick={() => setActiveTab('overview')}
+                >
+                  <LayoutDashboard className="mr-2 h-5 w-5" />
+                  Overview
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost"
+                  className={`w-full justify-start ${activeTab === 'auctions' ? 'bg-secondary dark:bg-gray-700' : ''}`}
+                  onClick={() => setActiveTab('auctions')}
+                >
+                  <Package className="mr-2 h-5 w-5" />
+                  Auctions
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost"
+                  className={`w-full justify-start ${activeTab === 'users' ? 'bg-secondary dark:bg-gray-700' : ''}`}
+                  onClick={() => setActiveTab('users')}
+                >
+                  <Users className="mr-2 h-5 w-5" />
+                  Users
+                </Button>
+              </li>
+            </ul>
+          </div>
+          
+          <div className="mb-6">
+            <p className="text-xs font-semibold text-muted-foreground mb-2 px-2">ANALYTICS</p>
+            <ul className="space-y-1">
+              <li>
+                <Button 
+                  variant="ghost"
+                  className={`w-full justify-start ${activeTab === 'reports' ? 'bg-secondary dark:bg-gray-700' : ''}`}
+                  onClick={() => setActiveTab('reports')}
+                >
+                  <BarChart className="mr-2 h-5 w-5" />
+                  Reports
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost"
+                  className="w-full justify-start"
+                >
+                  <TrendingUp className="mr-2 h-5 w-5" />
+                  Trends
+                  <Badge variant="outline" className="ml-auto mr-1">New</Badge>
+                </Button>
+              </li>
+            </ul>
+          </div>
+          
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground mb-2 px-2">SETTINGS</p>
+            <ul className="space-y-1">
+              <li>
+                <Button 
+                  variant="ghost"
+                  className={`w-full justify-start ${activeTab === 'settings' ? 'bg-secondary dark:bg-gray-700' : ''}`}
+                  onClick={() => setActiveTab('settings')}
+                >
+                  <Settings className="mr-2 h-5 w-5" />
+                  Settings
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost"
+                  className="w-full justify-start"
+                  onClick={toggleDarkMode}
+                >
+                  {darkMode ? (
+                    <Sun className="mr-2 h-5 w-5" />
+                  ) : (
+                    <Moon className="mr-2 h-5 w-5" />
+                  )}
+                  {darkMode ? 'Light Mode' : 'Dark Mode'}
+                </Button>
+              </li>
+              <li>
+                <Button 
+                  variant="ghost"
+                  className="w-full justify-start"
+                >
+                  <HelpCircle className="mr-2 h-5 w-5" />
+                  Help Center
+                </Button>
+              </li>
+            </ul>
+          </div>
         </nav>
         
-        <div className="p-4 border-t mt-auto">
+        <div className="p-4 border-t dark:border-gray-700 mt-auto">
           <Button variant="outline" className="w-full mb-2" onClick={handleAdminLogout}>
             <LogOut className="mr-2 h-4 w-4" />
             Logout
           </Button>
           <Link to="/">
             <Button variant="outline" className="w-full">
-              <LayoutDashboard className="mr-2 h-4 w-4" />
+              <Home className="mr-2 h-4 w-4" />
               Back to Site
             </Button>
           </Link>
@@ -268,17 +337,18 @@ const AdminDashboard = () => {
       
       <main className="flex-1 overflow-auto p-6">
         <div className="max-w-6xl mx-auto">
-          <header className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
+          <header className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between">
             <div>
-              <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+              <h1 className="text-2xl font-bold dark:text-white">Admin Dashboard</h1>
               <p className="text-muted-foreground">Manage your auctions, users, and settings</p>
             </div>
             
             <div className="flex space-x-2 mt-4 md:mt-0">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="icon">
+                  <Button variant="outline" size="icon" className="relative">
                     <BellRing size={20} />
+                    <span className="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-80">
@@ -317,6 +387,10 @@ const AdminDashboard = () => {
             </TabsList>
             
             <TabsContent value="overview">
+              <WelcomeBanner />
+              
+              <QuickActions />
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
                 {STATS.map((stat, index) => (
                   <StatCard 
@@ -337,7 +411,15 @@ const AdminDashboard = () => {
               
               <Card className="mb-8 opacity-0 animate-scale-in" style={{ animationDelay: `400ms` }}>
                 <CardHeader>
-                  <CardTitle>Recent Auctions</CardTitle>
+                  <div className="flex justify-between items-center">
+                    <div className="flex items-center">
+                      <CardTitle>Recent Auctions</CardTitle>
+                      <DashboardTooltip content="Most recently created or updated auction listings" />
+                    </div>
+                    <Button variant="outline" size="sm" onClick={() => setActiveTab('auctions')}>
+                      View All
+                    </Button>
+                  </div>
                   <CardDescription>
                     Overview of your most recent auction listings
                   </CardDescription>
@@ -364,16 +446,32 @@ const AdminDashboard = () => {
                             <TableCell>
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                 auction.status === 'active' 
-                                  ? 'bg-green-100 text-green-700' 
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
                                   : auction.status === 'pending' 
-                                    ? 'bg-amber-100 text-amber-700' 
-                                    : 'bg-gray-100 text-gray-700'
+                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300' 
+                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                               }`}>
                                 {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
                               </span>
                             </TableCell>
                             <TableCell>${auction.currentBid.toLocaleString()}</TableCell>
-                            <TableCell>{auction.bidders}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                {auction.bidders}
+                                {auction.bidders > 20 && (
+                                  <TooltipProvider>
+                                    <Tooltip>
+                                      <TooltipTrigger asChild>
+                                        <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800">Hot</Badge>
+                                      </TooltipTrigger>
+                                      <TooltipContent>
+                                        <p>High interest auction</p>
+                                      </TooltipContent>
+                                    </Tooltip>
+                                  </TooltipProvider>
+                                )}
+                              </div>
+                            </TableCell>
                             <TableCell>{auction.endDate}</TableCell>
                             <TableCell>
                               <DropdownMenu>
@@ -387,9 +485,13 @@ const AdminDashboard = () => {
                                     <Edit size={14} className="mr-2" />
                                     Edit
                                   </DropdownMenuItem>
+                                  <DropdownMenuItem>
+                                    <ArrowUpRight size={14} className="mr-2" />
+                                    View Details
+                                  </DropdownMenuItem>
                                   <DropdownMenuSeparator />
                                   <DropdownMenuItem 
-                                    className="text-red-500" 
+                                    className="text-red-500 dark:text-red-400" 
                                     onClick={() => handleDeleteAuction(auction.id)}
                                   >
                                     <Trash2 size={14} className="mr-2" />
@@ -403,25 +505,26 @@ const AdminDashboard = () => {
                       </TableBody>
                     </Table>
                   </div>
-                  <div className="flex justify-center mt-4">
-                    <Button variant="outline" size="sm" onClick={() => setActiveTab('auctions')}>
-                      View All Auctions
-                    </Button>
-                  </div>
                 </CardContent>
               </Card>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Card className="opacity-0 animate-fade-in" style={{ animationDelay: `600ms` }}>
                   <CardHeader>
-                    <CardTitle>Recent Notifications</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <CardTitle>Recent Notifications</CardTitle>
+                        <DashboardTooltip content="Latest system notifications and alerts" />
+                      </div>
+                      <Button variant="ghost" size="sm">View All</Button>
+                    </div>
                     <CardDescription>Latest updates from your auction platform</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {NOTIFICATIONS.map(notification => (
                         <div key={notification.id} className="flex items-start pb-4 border-b last:border-0 last:pb-0">
-                          <div className="mr-4 p-2 bg-secondary rounded-full">
+                          <div className="mr-4 p-2 bg-secondary rounded-full dark:bg-gray-700">
                             <BellRing size={16} />
                           </div>
                           <div>
@@ -436,14 +539,20 @@ const AdminDashboard = () => {
                 
                 <Card className="opacity-0 animate-fade-in" style={{ animationDelay: `800ms` }}>
                   <CardHeader>
-                    <CardTitle>Ending Soon</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <CardTitle>Ending Soon</CardTitle>
+                        <DashboardTooltip content="Auctions that will end in the next 24 hours" />
+                      </div>
+                      <Button variant="ghost" size="sm">View All</Button>
+                    </div>
                     <CardDescription>Auctions that will end in the next 24 hours</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       {RECENT_AUCTIONS.filter(a => a.status === 'active').slice(0, 3).map(auction => (
                         <div key={auction.id} className="flex items-start pb-4 border-b last:border-0 last:pb-0">
-                          <div className="mr-4 p-2 bg-secondary rounded-full">
+                          <div className="mr-4 p-2 bg-secondary rounded-full dark:bg-gray-700">
                             <Clock size={16} />
                           </div>
                           <div className="flex-1">
@@ -465,9 +574,9 @@ const AdminDashboard = () => {
             </TabsContent>
             
             <TabsContent value="auctions">
-              <div className="bg-white rounded-lg shadow-sm border p-6 animate-fade-in">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border dark:border-gray-700 p-6 animate-fade-in">
                 <div className="flex flex-col md:flex-row justify-between items-center mb-6">
-                  <h2 className="text-xl font-bold mb-4 md:mb-0">Manage Auctions</h2>
+                  <h2 className="text-xl font-bold mb-4 md:mb-0 dark:text-white">Manage Auctions</h2>
                   <div className="flex w-full md:w-auto gap-3">
                     <div className="relative flex-1 md:w-64">
                       <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -508,16 +617,23 @@ const AdminDashboard = () => {
                             <TableCell>
                               <span className={`px-2 py-1 rounded-full text-xs font-medium ${
                                 auction.status === 'active' 
-                                  ? 'bg-green-100 text-green-700' 
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
                                   : auction.status === 'pending' 
-                                    ? 'bg-amber-100 text-amber-700' 
-                                    : 'bg-gray-100 text-gray-700'
+                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300' 
+                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
                               }`}>
                                 {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
                               </span>
                             </TableCell>
                             <TableCell>${auction.currentBid.toLocaleString()}</TableCell>
-                            <TableCell>{auction.bidders}</TableCell>
+                            <TableCell>
+                              <div className="flex items-center">
+                                {auction.bidders}
+                                {auction.bidders > 20 && (
+                                  <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800">Hot</Badge>
+                                )}
+                              </div>
+                            </TableCell>
                             <TableCell>{auction.endDate}</TableCell>
                             <TableCell>
                               <div className="flex space-x-1">
@@ -528,7 +644,7 @@ const AdminDashboard = () => {
                                 <Button 
                                   variant="outline" 
                                   size="sm" 
-                                  className="text-red-500" 
+                                  className="text-red-500 dark:text-red-400" 
                                   onClick={() => handleDeleteAuction(auction.id)}
                                 >
                                   <Trash2 size={14} className="mr-2" />
