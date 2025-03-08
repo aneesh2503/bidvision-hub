@@ -11,15 +11,9 @@ import {
   LogOut,
   Plus,
   Search,
-  MoreHorizontal,
   ArrowUpRight,
-  Edit,
-  Trash2,
   PieChart,
   LineChart,
-  ArrowDownUp,
-  Download,
-  Calendar,
   Filter,
   Wallet,
   Activity,
@@ -46,26 +40,12 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import Logo from '../components/Logo';
 import { toast } from "sonner";
 import { adminAuthService } from '@/services/adminAuthService';
@@ -77,6 +57,7 @@ import TopBidders from '@/components/dashboard/TopBidders';
 import DashboardTooltip from '@/components/dashboard/DashboardTooltip';
 import WelcomeBanner from '@/components/dashboard/WelcomeBanner';
 import QuickActions from '@/components/dashboard/QuickActions';
+import AuctionTable from '@/components/dashboard/AuctionTable';
 
 const RECENT_AUCTIONS = [
   {
@@ -193,6 +174,10 @@ const AdminDashboard = () => {
   
   const handleEditAuction = (id: string) => {
     toast(`Edit auction ${id}`);
+  };
+
+  const handleViewAuction = (id: string) => {
+    toast.info(`Viewing auction details for ${id}`);
   };
 
   const handleExportReport = (type: string) => {
@@ -425,86 +410,12 @@ const AdminDashboard = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="overflow-x-auto">
-                    <Table>
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>ID</TableHead>
-                          <TableHead>Item</TableHead>
-                          <TableHead>Status</TableHead>
-                          <TableHead>Current Bid</TableHead>
-                          <TableHead>Bidders</TableHead>
-                          <TableHead>End Date</TableHead>
-                          <TableHead></TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {RECENT_AUCTIONS.slice(0, 3).map((auction) => (
-                          <TableRow key={auction.id}>
-                            <TableCell className="font-medium">{auction.id}</TableCell>
-                            <TableCell>{auction.title}</TableCell>
-                            <TableCell>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                auction.status === 'active' 
-                                  ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                                  : auction.status === 'pending' 
-                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300' 
-                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
-                              }`}>
-                                {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
-                              </span>
-                            </TableCell>
-                            <TableCell>${auction.currentBid.toLocaleString()}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                {auction.bidders}
-                                {auction.bidders > 20 && (
-                                  <TooltipProvider>
-                                    <Tooltip>
-                                      <TooltipTrigger asChild>
-                                        <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800">Hot</Badge>
-                                      </TooltipTrigger>
-                                      <TooltipContent>
-                                        <p>High interest auction</p>
-                                      </TooltipContent>
-                                    </Tooltip>
-                                  </TooltipProvider>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>{auction.endDate}</TableCell>
-                            <TableCell>
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="icon">
-                                    <MoreHorizontal size={16} />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem onClick={() => handleEditAuction(auction.id)}>
-                                    <Edit size={14} className="mr-2" />
-                                    Edit
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem>
-                                    <ArrowUpRight size={14} className="mr-2" />
-                                    View Details
-                                  </DropdownMenuItem>
-                                  <DropdownMenuSeparator />
-                                  <DropdownMenuItem 
-                                    className="text-red-500 dark:text-red-400" 
-                                    onClick={() => handleDeleteAuction(auction.id)}
-                                  >
-                                    <Trash2 size={14} className="mr-2" />
-                                    Delete
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                    </Table>
-                  </div>
+                  <AuctionTable 
+                    data={RECENT_AUCTIONS.slice(0, 3)} 
+                    onEdit={handleEditAuction}
+                    onDelete={handleDeleteAuction}
+                    onView={handleViewAuction}
+                  />
                 </CardContent>
               </Card>
               
@@ -595,75 +506,12 @@ const AdminDashboard = () => {
                   </div>
                 </div>
                 
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>ID</TableHead>
-                        <TableHead>Item</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead>Current Bid</TableHead>
-                        <TableHead>Bidders</TableHead>
-                        <TableHead>End Date</TableHead>
-                        <TableHead>Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredAuctions.length > 0 ? (
-                        filteredAuctions.map((auction) => (
-                          <TableRow key={auction.id}>
-                            <TableCell className="font-medium">{auction.id}</TableCell>
-                            <TableCell>{auction.title}</TableCell>
-                            <TableCell>
-                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                                auction.status === 'active' 
-                                  ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' 
-                                  : auction.status === 'pending' 
-                                    ? 'bg-amber-100 text-amber-700 dark:bg-amber-900 dark:text-amber-300' 
-                                    : 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
-                              }`}>
-                                {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
-                              </span>
-                            </TableCell>
-                            <TableCell>${auction.currentBid.toLocaleString()}</TableCell>
-                            <TableCell>
-                              <div className="flex items-center">
-                                {auction.bidders}
-                                {auction.bidders > 20 && (
-                                  <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800">Hot</Badge>
-                                )}
-                              </div>
-                            </TableCell>
-                            <TableCell>{auction.endDate}</TableCell>
-                            <TableCell>
-                              <div className="flex space-x-1">
-                                <Button variant="outline" size="sm" onClick={() => handleEditAuction(auction.id)}>
-                                  <Edit size={14} className="mr-2" />
-                                  Edit
-                                </Button>
-                                <Button 
-                                  variant="outline" 
-                                  size="sm" 
-                                  className="text-red-500 dark:text-red-400" 
-                                  onClick={() => handleDeleteAuction(auction.id)}
-                                >
-                                  <Trash2 size={14} className="mr-2" />
-                                  Delete
-                                </Button>
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        ))
-                      ) : (
-                        <TableRow>
-                          <TableCell colSpan={7} className="text-center py-4">
-                            No auctions found matching your search.
-                          </TableCell>
-                        </TableRow>
-                      )}
-                    </TableBody>
-                  </Table>
-                </div>
+                <AuctionTable 
+                  data={filteredAuctions} 
+                  onEdit={handleEditAuction}
+                  onDelete={handleDeleteAuction}
+                  onView={handleViewAuction}
+                />
               </div>
             </TabsContent>
             
