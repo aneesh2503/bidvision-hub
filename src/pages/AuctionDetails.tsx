@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
-import { Clock, HandCoins, Heart } from 'lucide-react';
+import { Clock, HandCoins, Heart, ArrowLeft } from 'lucide-react';
 import { toast } from "sonner";
 import PaymentModal from '@/components/PaymentModal';
 
@@ -87,6 +87,18 @@ const AuctionDetails = () => {
   
   return (
     <div className="container mx-auto p-4">
+      {/* Back button */}
+      <div className="mb-6">
+        <Button 
+          variant="ghost" 
+          className="flex items-center hover:bg-gray-100 dark:hover:bg-gray-800"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Back to listings
+        </Button>
+      </div>
+      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Left column: Image */}
         <div className="relative">
@@ -130,9 +142,9 @@ const AuctionDetails = () => {
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Details</h2>
             <p className="text-gray-700">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam in dui mauris. 
-              Vivamus hendrerit arcu sed erat molestie vehicula. Sed auctor neque eu tellus 
-              rhoncus ut eleifend nibh porttitor.
+              This item is available for auction and subject to our terms and conditions. 
+              Shipping is available worldwide. The auction winner will be notified immediately 
+              after the auction closes. Please review all details and photos carefully before bidding.
             </p>
           </div>
           
