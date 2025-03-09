@@ -30,9 +30,18 @@ import {
   RotateCw,
   Download,
   EyeIcon,
+  CalendarRange,
+  DollarSign,
+  ShieldAlert,
+  Bookmark,
+  AlertCircle,
+  Share2,
+  Printer,
+  RefreshCw,
 } from 'lucide-react';
 import { toast } from "sonner";
 import DashboardTooltip from "./DashboardTooltip";
+import { Card } from "@/components/ui/card";
 
 export interface AuctionItem {
   id: string;
@@ -64,6 +73,9 @@ const AuctionTable = ({
   const [isLoading, setIsLoading] = useState(false);
   const [highlightedRow, setHighlightedRow] = useState<string | null>(null);
   const [lastSortedField, setLastSortedField] = useState<keyof AuctionItem | null>(null);
+  const [selectedRows, setSelectedRows] = useState<string[]>([]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [expandedRow, setExpandedRow] = useState<string | null>(null);
 
   // Get status badge style
   const getStatusStyle = (status: string) => {
@@ -124,6 +136,61 @@ const AuctionTable = ({
         setTimeout(() => setHighlightedRow(null), 300);
       }, Math.random() * 200);
     });
+
+    // Show toast for sorting
+    toast(`Sorted by ${field} ${isAsc ? 'descending' : 'ascending'}`);
+  };
+
+  // Toggle row selection
+  const toggleRowSelection = (id: string) => {
+    if (selectedRows.includes(id)) {
+      setSelectedRows(selectedRows.filter(rowId => rowId !== id));
+    } else {
+      setSelectedRows([...selectedRows, id]);
+    }
+  };
+
+  // Select all rows
+  const toggleSelectAll = () => {
+    if (selectedRows.length === currentItems.length) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(currentItems.map(item => item.id));
+    }
+  };
+
+  // Toggle row expansion
+  const toggleRowExpansion = (id: string) => {
+    if (expandedRow === id) {
+      setExpandedRow(null);
+    } else {
+      setExpandedRow(id);
+    }
+  };
+
+  // Bulk actions
+  const handleBulkAction = (action: string) => {
+    if (selectedRows.length === 0) {
+      toast.error("No items selected");
+      return;
+    }
+    
+    switch(action) {
+      case 'delete':
+        toast.success(`Deleted ${selectedRows.length} items`);
+        break;
+      case 'export':
+        toast.success(`Exported ${selectedRows.length} items`);
+        break;
+      case 'print':
+        toast.success(`Printing ${selectedRows.length} items`);
+        break;
+      default:
+        toast(`${action} ${selectedRows.length} items`);
+    }
+    
+    // Clear selection after action
+    setSelectedRows([]);
   };
 
   // Simulate loading more data with cursor
@@ -166,13 +233,14 @@ const AuctionTable = ({
             disabled={isLoading}
             className="flex items-center transition-all hover:shadow-md"
           >
-            <RotateCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
           <Button 
-            variant="outline" 
+            variant={showFilters ? "default" : "outline"}
             size="sm" 
-            className="flex items-center transition-all hover:shadow-md hover:bg-secondary"
+            className="flex items-center transition-all hover:shadow-md"
+            onClick={() => setShowFilters(!showFilters)}
           >
             <Filter className="h-4 w-4 mr-2" />
             Filter
@@ -186,6 +254,34 @@ const AuctionTable = ({
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
+          
+          {selectedRows.length > 0 && (
+            <div className="ml-2 flex items-center animate-fade-in">
+              <span className="text-sm font-medium mr-2">{selectedRows.length} selected</span>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="sm" className="h-8">
+                    Bulk Actions
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="start" className="animate-scale-in">
+                  <DropdownMenuItem onClick={() => handleBulkAction('export')}>
+                    <Download className="h-4 w-4 mr-2" />Export Selected
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => handleBulkAction('print')}>
+                    <Printer className="h-4 w-4 mr-2" />Print Selected
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem 
+                    onClick={() => handleBulkAction('delete')}
+                    className="text-red-500 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />Delete Selected
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          )}
         </div>
         <div className="flex items-center space-x-2">
           <span className="text-sm text-muted-foreground animate-fade-in">
@@ -203,10 +299,59 @@ const AuctionTable = ({
         </div>
       </div>
 
+      {showFilters && (
+        <Card className="p-4 animate-fade-in border-primary/20">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="text-sm font-medium mb-1 block">Status</label>
+              <select className="w-full border rounded px-3 py-2 text-sm">
+                <option value="all">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="pending">Pending</option>
+                <option value="ended">Ended</option>
+                <option value="sold">Sold</option>
+                <option value="canceled">Canceled</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">Bid Range</label>
+              <div className="flex space-x-2">
+                <input placeholder="Min" type="number" className="w-full border rounded px-3 py-2 text-sm" />
+                <input placeholder="Max" type="number" className="w-full border rounded px-3 py-2 text-sm" />
+              </div>
+            </div>
+            <div>
+              <label className="text-sm font-medium mb-1 block">End Date</label>
+              <div className="flex space-x-2">
+                <select className="w-full border rounded px-3 py-2 text-sm">
+                  <option value="all">Any Time</option>
+                  <option value="today">Today</option>
+                  <option value="tomorrow">Tomorrow</option>
+                  <option value="week">This Week</option>
+                  <option value="month">This Month</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex justify-end col-span-3 mt-2">
+              <Button variant="outline" size="sm" className="mr-2">Reset</Button>
+              <Button size="sm">Apply Filters</Button>
+            </div>
+          </div>
+        </Card>
+      )}
+
       <div className="rounded-md border overflow-hidden transition-all hover:shadow-md">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
+              <TableHead className="w-[40px]">
+                <input 
+                  type="checkbox" 
+                  className="rounded border-gray-300 text-primary focus:ring-primary/30 h-4 w-4 cursor-pointer transition-all"
+                  checked={selectedRows.length === currentItems.length && currentItems.length > 0}
+                  onChange={toggleSelectAll}
+                />
+              </TableHead>
               <TableHead className="w-[80px]">
                 <div 
                   className="flex items-center cursor-pointer transition-colors hover:text-primary" 
@@ -281,88 +426,217 @@ const AuctionTable = ({
           <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((auction, index) => (
-                <TableRow 
-                  key={auction.id}
-                  className={`group transition-all duration-200
-                    ${highlightedRow === auction.id ? 'bg-primary/5' : 'hover:bg-muted/50'} 
-                    ${sortField && lastSortedField === sortField ? 'animate-fade-in' : ''}
-                    ${isLoading ? 'opacity-50' : 'opacity-100'}`}
-                  style={{ animationDelay: `${index * 50}ms` }}
-                >
-                  <TableCell className="font-medium">{auction.id}</TableCell>
-                  <TableCell className="max-w-[200px] truncate">{auction.title}</TableCell>
-                  <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(auction.status)} transition-all group-hover:shadow-sm`}>
-                      {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-medium transition-all group-hover:text-primary">
-                      ${auction.currentBid.toLocaleString()}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      {auction.bidders}
-                      {auction.bidders > 20 && (
-                        <Badge 
-                          variant="outline" 
-                          className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800 animate-pulse-soft"
-                        >
-                          Hot
-                        </Badge>
-                      )}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center">
-                      <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
-                      {auction.endDate}
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-secondary"
-                        >
-                          <MoreHorizontal size={16} />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="animate-scale-in">
-                        <DropdownMenuItem 
-                          onClick={() => onView(auction.id)} 
-                          className="transition-colors hover:text-primary"
-                        >
-                          <EyeIcon size={14} className="mr-2" />
-                          View Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => onEdit(auction.id)}
-                          className="transition-colors hover:text-primary"
-                        >
-                          <Edit size={14} className="mr-2" />
-                          Edit
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-red-500 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/30" 
-                          onClick={() => onDelete(auction.id)}
-                        >
-                          <Trash2 size={14} className="mr-2" />
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
+                <React.Fragment key={auction.id}>
+                  <TableRow 
+                    className={`group transition-all duration-200
+                      ${highlightedRow === auction.id ? 'bg-primary/5' : 'hover:bg-muted/50'} 
+                      ${sortField && lastSortedField === sortField ? 'animate-fade-in' : ''}
+                      ${isLoading ? 'opacity-50' : 'opacity-100'}
+                      ${selectedRows.includes(auction.id) ? 'bg-primary/10' : ''}
+                      ${expandedRow === auction.id ? 'border-b-0 border-x border-t rounded-t-md border-primary/30' : ''}`}
+                    style={{ animationDelay: `${index * 50}ms` }}
+                    onClick={() => toggleRowExpansion(auction.id)}
+                  >
+                    <TableCell className="w-[40px]" onClick={(e) => e.stopPropagation()}>
+                      <input 
+                        type="checkbox" 
+                        className="rounded border-gray-300 text-primary focus:ring-primary h-4 w-4 cursor-pointer transition-all"
+                        checked={selectedRows.includes(auction.id)}
+                        onChange={() => toggleRowSelection(auction.id)}
+                      />
+                    </TableCell>
+                    <TableCell className="font-medium">{auction.id}</TableCell>
+                    <TableCell className="max-w-[200px] truncate">{auction.title}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(auction.status)} transition-all group-hover:shadow-sm`}>
+                        {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <span className="font-medium transition-all group-hover:text-primary">
+                        ${auction.currentBid.toLocaleString()}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        {auction.bidders}
+                        {auction.bidders > 20 && (
+                          <Badge 
+                            variant="outline" 
+                            className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800 animate-pulse-soft"
+                          >
+                            Hot
+                          </Badge>
+                        )}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center">
+                        <Clock className="h-3 w-3 mr-1 text-muted-foreground" />
+                        {auction.endDate}
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right" onClick={(e) => e.stopPropagation()}>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-secondary"
+                          >
+                            <MoreHorizontal size={16} />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="animate-scale-in">
+                          <DropdownMenuItem 
+                            onClick={() => onView(auction.id)} 
+                            className="transition-colors hover:text-primary"
+                          >
+                            <EyeIcon size={14} className="mr-2" />
+                            View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            onClick={() => onEdit(auction.id)}
+                            className="transition-colors hover:text-primary"
+                          >
+                            <Edit size={14} className="mr-2" />
+                            Edit
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="transition-colors hover:text-primary"
+                            onClick={() => {
+                              toast.success(`Sharing auction ${auction.id}`);
+                            }}
+                          >
+                            <Share2 size={14} className="mr-2" />
+                            Share
+                          </DropdownMenuItem>
+                          <DropdownMenuItem 
+                            className="transition-colors hover:text-primary"
+                            onClick={() => {
+                              toast.success(`Auction ${auction.id} printed`);
+                            }}
+                          >
+                            <Printer size={14} className="mr-2" />
+                            Print
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-red-500 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/30" 
+                            onClick={() => onDelete(auction.id)}
+                          >
+                            <Trash2 size={14} className="mr-2" />
+                            Delete
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                  
+                  {expandedRow === auction.id && (
+                    <TableRow className="bg-muted/30 border-x border-b rounded-b-md border-primary/30 animate-fade-in">
+                      <TableCell colSpan={8} className="p-4">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                          <div>
+                            <h4 className="text-sm font-semibold flex items-center">
+                              <CalendarRange className="h-4 w-4 mr-2 text-muted-foreground" />
+                              Auction Timeline
+                            </h4>
+                            <div className="mt-2 text-sm">
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Created:</span>
+                                <span>June 12, 2023</span>
+                              </div>
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Started:</span>
+                                <span>June 15, 2023</span>
+                              </div>
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Ends:</span>
+                                <span className="font-medium">{auction.endDate}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-semibold flex items-center">
+                              <DollarSign className="h-4 w-4 mr-2 text-muted-foreground" />
+                              Bid History
+                            </h4>
+                            <div className="mt-2 text-sm">
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Starting Price:</span>
+                                <span>${(auction.currentBid * 0.6).toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Total Bids:</span>
+                                <span>{auction.bidders}</span>
+                              </div>
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Current Bid:</span>
+                                <span className="font-medium text-primary">${auction.currentBid.toLocaleString()}</span>
+                              </div>
+                            </div>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-sm font-semibold flex items-center">
+                              <ShieldAlert className="h-4 w-4 mr-2 text-muted-foreground" />
+                              Status Information
+                            </h4>
+                            <div className="mt-2 text-sm">
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Current Status:</span>
+                                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${getStatusStyle(auction.status)}`}>
+                                  {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
+                                </span>
+                              </div>
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Last Updated:</span>
+                                <span>Today at 10:42 AM</span>
+                              </div>
+                              <div className="flex justify-between py-1 border-b">
+                                <span>Visibility:</span>
+                                <span>Public</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        <div className="flex mt-4 justify-end">
+                          <Button variant="outline" size="sm" className="mr-2" onClick={(e) => {
+                            e.stopPropagation();
+                            toast.success(`${auction.title} added to watchlist`);
+                          }}>
+                            <Bookmark className="h-4 w-4 mr-2" />
+                            Add to Watchlist
+                          </Button>
+                          <Button variant="outline" size="sm" className="mr-2" onClick={(e) => {
+                            e.stopPropagation();
+                            window.open(`#/auction/${auction.id}`, '_blank');
+                            toast(`Opening auction ${auction.id} details`);
+                          }}>
+                            <ArrowUpRight className="h-4 w-4 mr-2" />
+                            Open in New Tab
+                          </Button>
+                          <Button size="sm" onClick={(e) => {
+                            e.stopPropagation();
+                            onEdit(auction.id);
+                          }}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit Auction
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+                </React.Fragment>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-24 text-center">
+                <TableCell colSpan={8} className="h-24 text-center">
                   <div className="flex flex-col items-center justify-center space-y-3 animate-fade-in">
+                    <AlertCircle className="h-8 w-8 text-muted-foreground" />
                     <div className="text-muted-foreground">No auction data found.</div>
                     <Button variant="outline" size="sm" onClick={refreshData} className="transition-all hover:shadow-md">
                       <RotateCw className="h-4 w-4 mr-2" />
@@ -388,17 +662,67 @@ const AuctionTable = ({
           Previous
         </Button>
         <div className="flex items-center space-x-2">
-          {Array.from({ length: totalPages }, (_, i) => (
-            <Button
-              key={i + 1}
-              variant={currentPage === i + 1 ? "default" : "outline"}
-              size="sm"
-              className={`w-9 h-9 p-0 transition-all ${currentPage === i + 1 ? 'animate-pulse-soft' : 'hover:shadow-md'}`}
-              onClick={() => paginate(i + 1)}
-            >
-              {i + 1}
-            </Button>
-          ))}
+          {totalPages <= 5 ? (
+            // Show all pages if 5 or fewer
+            Array.from({ length: totalPages }, (_, i) => (
+              <Button
+                key={i + 1}
+                variant={currentPage === i + 1 ? "default" : "outline"}
+                size="sm"
+                className={`w-9 h-9 p-0 transition-all ${currentPage === i + 1 ? 'animate-pulse-soft' : 'hover:shadow-md'}`}
+                onClick={() => paginate(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))
+          ) : (
+            // Show pagination with ellipsis for more than 5 pages
+            <>
+              {[1, 2].map(num => (
+                <Button
+                  key={num}
+                  variant={currentPage === num ? "default" : "outline"}
+                  size="sm"
+                  className={`w-9 h-9 p-0 transition-all ${currentPage === num ? 'animate-pulse-soft' : 'hover:shadow-md'}`}
+                  onClick={() => paginate(num)}
+                  style={{ display: num > totalPages ? 'none' : 'block' }}
+                >
+                  {num}
+                </Button>
+              ))}
+              
+              {currentPage > 3 && (
+                <span className="px-2">...</span>
+              )}
+              
+              {currentPage > 2 && currentPage < totalPages - 1 && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="w-9 h-9 p-0 animate-pulse-soft"
+                >
+                  {currentPage}
+                </Button>
+              )}
+              
+              {currentPage < totalPages - 2 && (
+                <span className="px-2">...</span>
+              )}
+              
+              {[totalPages - 1, totalPages].map(num => (
+                <Button
+                  key={num}
+                  variant={currentPage === num ? "default" : "outline"}
+                  size="sm"
+                  className={`w-9 h-9 p-0 transition-all ${currentPage === num ? 'animate-pulse-soft' : 'hover:shadow-md'}`}
+                  onClick={() => paginate(num)}
+                  style={{ display: num <= 0 ? 'none' : 'block' }}
+                >
+                  {num}
+                </Button>
+              ))}
+            </>
+          )}
         </div>
         <Button
           variant="outline"
@@ -416,3 +740,4 @@ const AuctionTable = ({
 };
 
 export default AuctionTable;
+

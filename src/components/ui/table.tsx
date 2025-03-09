@@ -1,3 +1,4 @@
+
 import * as React from "react"
 
 import { cn } from "@/lib/utils"
@@ -53,12 +54,17 @@ TableFooter.displayName = "TableFooter"
 
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
-  React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLTableRowElement> & {
+    isExpanded?: boolean;
+    isSelected?: boolean;
+  }
+>(({ className, isExpanded, isSelected, ...props }, ref) => (
   <tr
     ref={ref}
     className={cn(
       "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      isExpanded && "bg-muted/30 border-primary/20",
+      isSelected && "bg-primary/10",
       className
     )}
     {...props}
@@ -68,26 +74,43 @@ TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
-  React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  React.ThHTMLAttributes<HTMLTableCellElement> & {
+    sorted?: boolean;
+    sortDirection?: 'asc' | 'desc';
+  }
+>(({ className, sorted, sortDirection, ...props }, ref) => (
   <th
     ref={ref}
     className={cn(
       "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      sorted && "text-primary",
       className
     )}
     {...props}
-  />
+  >
+    {props.children}
+    {sorted && (
+      <span className="inline-flex ml-1">
+        {sortDirection === 'asc' ? '↑' : '↓'}
+      </span>
+    )}
+  </th>
 ))
 TableHead.displayName = "TableHead"
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
-  React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => (
+  React.TdHTMLAttributes<HTMLTableCellElement> & {
+    highlight?: boolean;
+  }
+>(({ className, highlight, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    className={cn(
+      "p-4 align-middle [&:has([role=checkbox])]:pr-0",
+      highlight && "animate-highlight-cell bg-primary/5",
+      className
+    )}
     {...props}
   />
 ))
