@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   Table,
@@ -61,6 +62,8 @@ const AuctionTable = ({
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [cursor, setCursor] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [highlightedRow, setHighlightedRow] = useState<string | null>(null);
+  const [lastSortedField, setLastSortedField] = useState<keyof AuctionItem | null>(null);
 
   // Get status badge style
   const getStatusStyle = (status: string) => {
@@ -108,9 +111,19 @@ const AuctionTable = ({
 
   // Handle sort
   const handleSort = (field: keyof AuctionItem) => {
+    setLastSortedField(sortField);
+    
     const isAsc = sortField === field && sortDirection === 'asc';
     setSortDirection(isAsc ? 'desc' : 'asc');
     setSortField(field);
+    
+    // Highlight rows briefly when sorting
+    currentItems.forEach(item => {
+      setTimeout(() => {
+        setHighlightedRow(item.id);
+        setTimeout(() => setHighlightedRow(null), 300);
+      }, Math.random() * 200);
+    });
   };
 
   // Simulate loading more data with cursor
@@ -151,26 +164,35 @@ const AuctionTable = ({
             size="sm"
             onClick={refreshData}
             disabled={isLoading}
-            className="flex items-center"
+            className="flex items-center transition-all hover:shadow-md"
           >
             <RotateCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
             Refresh
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center transition-all hover:shadow-md hover:bg-secondary"
+          >
             <Filter className="h-4 w-4 mr-2" />
             Filter
           </Button>
-          <Button variant="outline" size="sm" className="flex items-center" onClick={exportData}>
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="flex items-center transition-all hover:shadow-md hover:bg-secondary" 
+            onClick={exportData}
+          >
             <Download className="h-4 w-4 mr-2" />
             Export
           </Button>
         </div>
         <div className="flex items-center space-x-2">
-          <span className="text-sm text-muted-foreground">
+          <span className="text-sm text-muted-foreground animate-fade-in">
             Showing {indexOfFirstItem + 1}-{Math.min(indexOfLastItem, sortedData.length)} of {sortedData.length}
           </span>
           <select
-            className="text-sm border rounded px-2 py-1 bg-background"
+            className="text-sm border rounded px-2 py-1 bg-background transition-all hover:shadow-sm focus:ring-2 focus:ring-primary/20"
             value={itemsPerPage}
             onChange={(e) => setItemsPerPage(Number(e.target.value))}
           >
@@ -181,57 +203,75 @@ const AuctionTable = ({
         </div>
       </div>
 
-      <div className="rounded-md border overflow-hidden">
+      <div className="rounded-md border overflow-hidden transition-all hover:shadow-md">
         <Table>
           <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead className="w-[80px]">
-                <div className="flex items-center cursor-pointer" onClick={() => handleSort('id')}>
+                <div 
+                  className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+                  onClick={() => handleSort('id')}
+                >
                   ID
                   {sortField === 'id' && (
-                    <ArrowDownUp className={`h-4 w-4 ml-1 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                    <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center cursor-pointer" onClick={() => handleSort('title')}>
+                <div 
+                  className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+                  onClick={() => handleSort('title')}
+                >
                   Item
                   {sortField === 'title' && (
-                    <ArrowDownUp className={`h-4 w-4 ml-1 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                    <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center cursor-pointer" onClick={() => handleSort('status')}>
+                <div 
+                  className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+                  onClick={() => handleSort('status')}
+                >
                   Status
                   {sortField === 'status' && (
-                    <ArrowDownUp className={`h-4 w-4 ml-1 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                    <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center cursor-pointer" onClick={() => handleSort('currentBid')}>
+                <div 
+                  className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+                  onClick={() => handleSort('currentBid')}
+                >
                   Current Bid
                   {sortField === 'currentBid' && (
-                    <ArrowDownUp className={`h-4 w-4 ml-1 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                    <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                   <DashboardTooltip content="The highest current bid amount" />
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center cursor-pointer" onClick={() => handleSort('bidders')}>
+                <div 
+                  className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+                  onClick={() => handleSort('bidders')}
+                >
                   Bidders
                   {sortField === 'bidders' && (
-                    <ArrowDownUp className={`h-4 w-4 ml-1 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                    <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                   <DashboardTooltip content="Number of unique bidders" />
                 </div>
               </TableHead>
               <TableHead>
-                <div className="flex items-center cursor-pointer" onClick={() => handleSort('endDate')}>
+                <div 
+                  className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+                  onClick={() => handleSort('endDate')}
+                >
                   End Date
                   {sortField === 'endDate' && (
-                    <ArrowDownUp className={`h-4 w-4 ml-1 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
+                    <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
                   )}
                 </div>
               </TableHead>
@@ -240,20 +280,24 @@ const AuctionTable = ({
           </TableHeader>
           <TableBody>
             {currentItems.length > 0 ? (
-              currentItems.map((auction) => (
+              currentItems.map((auction, index) => (
                 <TableRow 
                   key={auction.id}
-                  className="hover:bg-muted/50 transition-colors"
+                  className={`group transition-all duration-200
+                    ${highlightedRow === auction.id ? 'bg-primary/5' : 'hover:bg-muted/50'} 
+                    ${sortField && lastSortedField === sortField ? 'animate-fade-in' : ''}
+                    ${isLoading ? 'opacity-50' : 'opacity-100'}`}
+                  style={{ animationDelay: `${index * 50}ms` }}
                 >
                   <TableCell className="font-medium">{auction.id}</TableCell>
                   <TableCell className="max-w-[200px] truncate">{auction.title}</TableCell>
                   <TableCell>
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(auction.status)}`}>
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusStyle(auction.status)} transition-all group-hover:shadow-sm`}>
                       {auction.status.charAt(0).toUpperCase() + auction.status.slice(1)}
                     </span>
                   </TableCell>
                   <TableCell>
-                    <span className="font-medium">
+                    <span className="font-medium transition-all group-hover:text-primary">
                       ${auction.currentBid.toLocaleString()}
                     </span>
                   </TableCell>
@@ -261,7 +305,10 @@ const AuctionTable = ({
                     <div className="flex items-center">
                       {auction.bidders}
                       {auction.bidders > 20 && (
-                        <Badge variant="outline" className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800">
+                        <Badge 
+                          variant="outline" 
+                          className="ml-2 bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-300 border-blue-200 dark:border-blue-800 animate-pulse-soft"
+                        >
                           Hot
                         </Badge>
                       )}
@@ -276,22 +323,32 @@ const AuctionTable = ({
                   <TableCell className="text-right">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon">
+                        <Button 
+                          variant="ghost" 
+                          size="icon" 
+                          className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-secondary"
+                        >
                           <MoreHorizontal size={16} />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onView(auction.id)}>
+                      <DropdownMenuContent align="end" className="animate-scale-in">
+                        <DropdownMenuItem 
+                          onClick={() => onView(auction.id)} 
+                          className="transition-colors hover:text-primary"
+                        >
                           <EyeIcon size={14} className="mr-2" />
                           View Details
                         </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => onEdit(auction.id)}>
+                        <DropdownMenuItem 
+                          onClick={() => onEdit(auction.id)}
+                          className="transition-colors hover:text-primary"
+                        >
                           <Edit size={14} className="mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem 
-                          className="text-red-500 dark:text-red-400" 
+                          className="text-red-500 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/30" 
                           onClick={() => onDelete(auction.id)}
                         >
                           <Trash2 size={14} className="mr-2" />
@@ -305,7 +362,13 @@ const AuctionTable = ({
             ) : (
               <TableRow>
                 <TableCell colSpan={7} className="h-24 text-center">
-                  No auction data found.
+                  <div className="flex flex-col items-center justify-center space-y-3 animate-fade-in">
+                    <div className="text-muted-foreground">No auction data found.</div>
+                    <Button variant="outline" size="sm" onClick={refreshData} className="transition-all hover:shadow-md">
+                      <RotateCw className="h-4 w-4 mr-2" />
+                      Refresh Data
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
@@ -319,7 +382,7 @@ const AuctionTable = ({
           size="sm"
           onClick={prevPage}
           disabled={currentPage === 1}
-          className="flex items-center"
+          className="flex items-center transition-all hover:shadow-md"
         >
           <ChevronLeft className="h-4 w-4 mr-2" />
           Previous
@@ -330,7 +393,7 @@ const AuctionTable = ({
               key={i + 1}
               variant={currentPage === i + 1 ? "default" : "outline"}
               size="sm"
-              className="w-9 h-9 p-0"
+              className={`w-9 h-9 p-0 transition-all ${currentPage === i + 1 ? 'animate-pulse-soft' : 'hover:shadow-md'}`}
               onClick={() => paginate(i + 1)}
             >
               {i + 1}
@@ -342,7 +405,7 @@ const AuctionTable = ({
           size="sm"
           onClick={loadMore}
           disabled={currentPage === totalPages || isLoading}
-          className="flex items-center"
+          className="flex items-center transition-all hover:shadow-md"
         >
           <span>{isLoading ? 'Loading...' : 'Next'}</span>
           <ChevronRight className="h-4 w-4 ml-2" />
