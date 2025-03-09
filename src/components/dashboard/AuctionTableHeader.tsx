@@ -11,25 +11,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Search } from 'lucide-react';
+import { TableHeaderProps } from './types';
 
-interface TableHeaderProps {
-  refreshData: () => void;
-  isLoading: boolean;
-  showFilters: boolean;
-  setShowFilters: (show: boolean) => void;
-  exportData: () => void;
-  selectedRows: string[];
-  handleBulkAction: (action: string) => void;
-  itemsPerPage: number;
-  setItemsPerPage: (value: number) => void;
-  indexOfFirstItem: number;
-  indexOfLastItem: number;
-  totalItems: number;
-  searchTerm?: string;
-  setSearchTerm?: (term: string) => void;
-}
-
-const TableHeader: React.FC<TableHeaderProps> = ({
+const AuctionTableHeader: React.FC<TableHeaderProps> = ({
   refreshData,
   isLoading,
   showFilters,
@@ -135,4 +119,4 @@ const TableHeader: React.FC<TableHeaderProps> = ({
   );
 };
 
-export default TableHeader;
+export default AuctionTableHeader;

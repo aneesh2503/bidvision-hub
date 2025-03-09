@@ -1,4 +1,3 @@
-
 import React, { useState, useMemo } from 'react';
 import {
   Table,
@@ -24,7 +23,7 @@ import TableRowActions from "./TableRowActions";
 import ExpandedRow from "./ExpandedRow";
 import FilterPanel from "./FilterPanel";
 import TablePagination from "./TablePagination";
-import TableHeader from "./TableHeader";
+import AuctionTableHeader from "./AuctionTableHeader";
 
 const AuctionTable = ({ 
   data, 
@@ -45,7 +44,6 @@ const AuctionTable = ({
   const [expandedRow, setExpandedRow] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Sort the data
   const sortedData = useMemo(() => {
     if (!sortField) return data;
     
@@ -60,7 +58,6 @@ const AuctionTable = ({
     });
   }, [data, sortField, sortDirection]);
 
-  // Apply search filter
   const filteredData = useMemo(() => {
     if (!searchTerm) return sortedData;
     
@@ -70,18 +67,15 @@ const AuctionTable = ({
     );
   }, [sortedData, searchTerm]);
 
-  // Get current items for pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
-  // Change page
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
   const nextPage = () => setCurrentPage(prev => Math.min(prev + 1, totalPages));
   const prevPage = () => setCurrentPage(prev => Math.max(prev - 1, 1));
 
-  // Handle sort
   const handleSort = (field: keyof AuctionItem) => {
     setLastSortedField(sortField);
     
@@ -89,7 +83,6 @@ const AuctionTable = ({
     setSortDirection(isAsc ? 'desc' : 'asc');
     setSortField(field);
     
-    // Highlight rows briefly when sorting
     currentItems.forEach(item => {
       setTimeout(() => {
         setHighlightedRow(item.id);
@@ -97,11 +90,9 @@ const AuctionTable = ({
       }, Math.random() * 200);
     });
 
-    // Show toast for sorting
     toast(`Sorted by ${field} ${isAsc ? 'descending' : 'ascending'}`);
   };
 
-  // Toggle row selection
   const toggleRowSelection = (id: string) => {
     if (selectedRows.includes(id)) {
       setSelectedRows(selectedRows.filter(rowId => rowId !== id));
@@ -110,7 +101,6 @@ const AuctionTable = ({
     }
   };
 
-  // Select all rows
   const toggleSelectAll = () => {
     if (selectedRows.length === currentItems.length) {
       setSelectedRows([]);
@@ -119,7 +109,6 @@ const AuctionTable = ({
     }
   };
 
-  // Toggle row expansion
   const toggleRowExpansion = (id: string) => {
     if (expandedRow === id) {
       setExpandedRow(null);
@@ -128,7 +117,6 @@ const AuctionTable = ({
     }
   };
 
-  // Bulk actions
   const handleBulkAction = (action: string) => {
     if (selectedRows.length === 0) {
       toast.error("No items selected");
@@ -149,16 +137,13 @@ const AuctionTable = ({
         toast(`${action} ${selectedRows.length} items`);
     }
     
-    // Clear selection after action
     setSelectedRows([]);
   };
 
-  // Simulate loading more data with cursor
   const loadMore = () => {
     if (currentPage < totalPages) {
       setIsLoading(true);
       
-      // Simulate API call with cursor
       setTimeout(() => {
         const lastItem = currentItems[currentItems.length - 1];
         setCursor(lastItem.id);
@@ -170,7 +155,6 @@ const AuctionTable = ({
 
   const refreshData = () => {
     setIsLoading(true);
-    // Simulate refresh
     setTimeout(() => {
       setIsLoading(false);
       toast.success("Data refreshed");
@@ -179,12 +163,11 @@ const AuctionTable = ({
 
   const exportData = () => {
     toast.success("Exporting auction data...");
-    // This would typically trigger a CSV or Excel download
   };
 
   return (
     <div className="space-y-4">
-      <TableHeader
+      <AuctionTableHeader
         refreshData={refreshData}
         isLoading={isLoading}
         showFilters={showFilters}
