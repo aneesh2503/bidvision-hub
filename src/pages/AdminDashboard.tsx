@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { 
@@ -21,7 +22,9 @@ import {
   Home,
   HelpCircle,
   Moon,
-  Sun
+  Sun,
+  CalendarIcon, // Fixed: Changed from Calendar to CalendarIcon
+  Download // Added: Import for Download icon
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -552,7 +555,7 @@ const AdminDashboard = () => {
                 <div className="mb-6">
                   <div className="flex flex-wrap gap-3 mb-4">
                     <Button variant="outline" size="sm" className="flex items-center gap-1.5">
-                      <Calendar className="h-4 w-4" />
+                      <CalendarIcon className="h-4 w-4" />
                       Date Range
                     </Button>
                     <Button variant="outline" size="sm" className="flex items-center gap-1.5">
