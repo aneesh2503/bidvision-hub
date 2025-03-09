@@ -5,7 +5,7 @@ import {
   TableBody,
   TableCell,
   TableHead,
-  TableHeader,
+  TableHeader as UITableHeader,
   TableRow,
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
@@ -205,7 +205,7 @@ const AuctionTable = ({
 
       <div className="rounded-md border overflow-hidden transition-all hover:shadow-md">
         <Table>
-          <TableHeader className="bg-muted/50">
+          <UITableHeader className="bg-muted/50">
             <TableRow>
               <TableHead className="w-[40px]">
                 <input 
@@ -285,7 +285,7 @@ const AuctionTable = ({
               </TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
-          </TableHeader>
+          </UITableHeader>
           <TableBody>
             {currentItems.length > 0 ? (
               currentItems.map((auction, index) => (
