@@ -12,6 +12,7 @@ interface TableSortHeaderProps {
   sortDirection: 'asc' | 'desc';
   onSort: (field: keyof AuctionItem) => void;
   tooltipContent?: string;
+  showBidCount?: boolean;
 }
 
 const TableSortHeader: React.FC<TableSortHeaderProps> = ({
@@ -20,12 +21,13 @@ const TableSortHeader: React.FC<TableSortHeaderProps> = ({
   sortField,
   sortDirection,
   onSort,
-  tooltipContent
+  tooltipContent,
+  showBidCount
 }) => {
   return (
     <TableHead>
       <div 
-        className="flex items-center cursor-pointer transition-colors hover:text-primary" 
+        className="flex items-center cursor-pointer transition-colors hover:text-primary dark:hover:text-primary" 
         onClick={() => onSort(field)}
       >
         {label}
@@ -33,6 +35,9 @@ const TableSortHeader: React.FC<TableSortHeaderProps> = ({
           <ArrowDownUp className={`h-4 w-4 ml-1 transition-transform duration-300 ${sortDirection === 'desc' ? 'rotate-180' : ''}`} />
         )}
         {tooltipContent && <DashboardTooltip content={tooltipContent} />}
+        {showBidCount && (
+          <span className="ml-1 text-xs text-muted-foreground dark:text-muted-foreground">(bids)</span>
+        )}
       </div>
     </TableHead>
   );

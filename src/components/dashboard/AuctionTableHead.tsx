@@ -26,7 +26,7 @@ const AuctionTableHead: React.FC<AuctionTableHeadProps> = ({
       <TableHead className="w-[40px]">
         <input 
           type="checkbox" 
-          className="rounded border-gray-300 text-primary focus:ring-primary/30 h-4 w-4 cursor-pointer transition-all"
+          className="rounded border-gray-300 text-primary focus:ring-primary/30 h-4 w-4 cursor-pointer transition-all dark:border-gray-600 dark:bg-gray-800 dark:checked:bg-primary"
           checked={selectedRows.length === currentItems.length && currentItems.length > 0}
           onChange={toggleSelectAll}
         />
@@ -72,6 +72,7 @@ const AuctionTableHead: React.FC<AuctionTableHeadProps> = ({
         sortDirection={sortDirection}
         onSort={handleSort}
         tooltipContent="Number of unique bidders"
+        showBidCount={true}
       />
       
       <TableSortHeader

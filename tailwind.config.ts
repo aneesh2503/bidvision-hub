@@ -101,6 +101,10 @@ export default {
 				'pulse-soft': {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.8' }
+				},
+				'theme-toggle': {
+					'0%': { transform: 'rotate(0deg)' },
+					'100%': { transform: 'rotate(360deg)' }
 				}
 			},
 			animation: {
@@ -111,7 +115,8 @@ export default {
 				'scale-in': 'scale-in 0.5s ease-out forwards',
 				'slide-up': 'slide-up 0.6s ease-out forwards',
 				'slide-down': 'slide-down 0.6s ease-out forwards',
-				'pulse-soft': 'pulse-soft 2s ease-in-out infinite'
+				'pulse-soft': 'pulse-soft 2s ease-in-out infinite',
+				'theme-toggle': 'theme-toggle 0.5s ease-in-out'
 			},
 			transitionTimingFunction: {
 				'expo-out': 'cubic-bezier(0.16, 1, 0.3, 1)',
