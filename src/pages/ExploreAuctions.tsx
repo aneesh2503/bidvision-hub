@@ -162,7 +162,18 @@ const ExploreAuctions = () => {
           ) : view === 'grid' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filteredItems.map((item) => (
-                <AuctionCard key={item.id} item={item} />
+                <AuctionCard 
+                  key={item.id}
+                  id={item.id}
+                  title={item.title}
+                  description={item.description}
+                  image={item.image}
+                  currentBid={item.currentBid}
+                  timeLeft={item.timeLeft}
+                  bids={item.bids}
+                  category={item.category}
+                  condition={item.condition}
+                />
               ))}
             </div>
           ) : (
@@ -178,7 +189,7 @@ const ExploreAuctions = () => {
                     <div className="mt-auto flex flex-wrap justify-between items-end gap-2">
                       <div>
                         <span className="text-sm text-muted-foreground block">Current Bid</span>
-                        <span className="text-lg font-semibold">${item.currentBid}</span>
+                        <span className="text-lg font-semibold">${item.currentBid.toLocaleString()}</span>
                       </div>
                       <div className="text-right">
                         <span className="text-sm text-muted-foreground block">{item.bids} bids</span>
