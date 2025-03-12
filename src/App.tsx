@@ -12,6 +12,8 @@ import Favorites from "./pages/Favorites";
 import NotFound from "./pages/NotFound";
 import AuctionDetails from "./pages/AuctionDetails";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
+import ExploreAuctions from "./pages/ExploreAuctions";
+import HowItWorksPage from "./pages/HowItWorksPage";
 
 const queryClient = new QueryClient();
 
@@ -32,6 +34,8 @@ const App = () => (
           <Route path="/logs" element={<LogViewer />} />
           <Route path="/favorites" element={<Favorites />} />
           <Route path="/auction/:id" element={<AuctionDetails />} />
+          <Route path="/explore" element={<ExploreAuctions />} />
+          <Route path="/how-it-works" element={<HowItWorksPage />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

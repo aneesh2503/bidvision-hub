@@ -3,6 +3,7 @@ import Hero from '@/components/Hero';
 import Navbar from '@/components/Navbar';
 import FeaturedAuctions from '@/components/FeaturedAuctions';
 import AuctionGrid from '@/components/AuctionGrid';
+import HowItWorks from '@/components/HowItWorks';
 import Footer from '@/components/Footer';
 
 const Index = () => {
@@ -12,6 +13,7 @@ const Index = () => {
       <main className="flex-1">
         <Hero />
         <FeaturedAuctions />
+        <HowItWorks />
         <AuctionGrid />
       </main>
       <Footer />
