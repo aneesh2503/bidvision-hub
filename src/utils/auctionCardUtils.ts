@@ -33,10 +33,10 @@ export const getConditionStyle = (condition?: string) => {
 // Get icon based on category
 export const getCategoryIcon = (category?: string) => {
   switch(category) {
-    case 'art': return <Sparkles className="h-3 w-3 mr-1" />;
-    case 'collectibles': return <Star className="h-3 w-3 mr-1" />;
-    case 'jewelry': return <Gem className="h-3 w-3 mr-1" />;
-    default: return <Tag className="h-3 w-3 mr-1" />;
+    case 'art': return React.createElement(Sparkles, { className: "h-3 w-3 mr-1" });
+    case 'collectibles': return React.createElement(Star, { className: "h-3 w-3 mr-1" });
+    case 'jewelry': return React.createElement(Gem, { className: "h-3 w-3 mr-1" });
+    default: return React.createElement(Tag, { className: "h-3 w-3 mr-1" });
   }
 };
 
