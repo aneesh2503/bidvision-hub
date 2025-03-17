@@ -19,7 +19,7 @@ const ResultsSummary = ({ count }: ResultsSummaryProps) => {
       <Button 
         variant="outline" 
         size="sm" 
-        className="flex items-center gap-1" 
+        className="flex items-center gap-1 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors" 
         onClick={() => navigate('/live-auctions')}
       >
         <Flame className="h-4 w-4 text-red-500" />

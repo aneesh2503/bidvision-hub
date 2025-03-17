@@ -1,5 +1,5 @@
 
-import { ArrowRight, Award, ShieldCheck, Clock } from 'lucide-react';
+import { ArrowRight, Award, ShieldCheck, Clock, Flame } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 
@@ -33,9 +33,25 @@ const Hero = () => {
                   <ArrowRight className="ml-2 w-4 h-4 transition-transform group-hover:translate-x-1" />
                 </Link>
               </Button>
-              <Button size="lg" variant="outline" asChild>
+              
+              <Button 
+                size="lg" 
+                variant="outline" 
+                asChild
+              >
                 <Link to="/how-it-works">
                   How It Works
+                </Link>
+              </Button>
+              
+              <Button 
+                size="lg" 
+                className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg group animate-pulse hover:animate-none hover:scale-105 transition-all"
+                asChild
+              >
+                <Link to="/live-auctions" className="flex items-center">
+                  <Flame className="mr-2 h-5 w-5 text-yellow-200 group-hover:animate-bounce" />
+                  Live Auctions
                 </Link>
               </Button>
             </div>
