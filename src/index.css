@@ -157,3 +157,23 @@
 .animate-delay-500 {
   animation-delay: 500ms;
 }
+
+/* Sparkle animation for the Live Auction button */
+@keyframes sparkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.sparkle {
+  animation: sparkle 2s ease-in-out infinite;
+}
+
+/* Shadow pulse animation */
+@keyframes shadow-pulse {
+  0%, 100% { box-shadow: 0 0 0 rgba(220, 38, 38, 0); }
+  50% { box-shadow: 0 0 20px rgba(220, 38, 38, 0.5); }
+}
+
+.shadow-pulse {
+  animation: shadow-pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

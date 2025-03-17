@@ -1,4 +1,3 @@
-
 import { 
   Plus, 
   Users, 
@@ -6,7 +5,8 @@ import {
   Package, 
   BarChart,
   Download,
-  Flame
+  Flame,
+  Sparkles
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -96,11 +96,17 @@ const QuickActions = () => {
           
           <Button 
             variant="outline" 
-            className="h-auto flex flex-col items-center justify-center py-4 px-2 gap-2 hover:bg-secondary/80 bg-red-50 dark:bg-red-900/20" 
+            className="h-auto flex flex-col items-center justify-center py-4 px-2 gap-2 relative overflow-hidden group bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 dark:from-purple-900/20 dark:to-pink-900/20 dark:hover:from-purple-900/30 dark:hover:to-pink-900/30 border-purple-200 dark:border-purple-800" 
             onClick={() => handleAction('Live Auctions')}
           >
-            <Flame className="h-5 w-5 text-red-500" />
-            <span className="text-xs text-center">Live Auctions</span>
+            <div className="relative">
+              <Flame className="h-5 w-5 text-red-500 group-hover:animate-pulse" />
+              <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-yellow-500 opacity-0 group-hover:opacity-100" />
+            </div>
+            <span className="text-xs text-center font-medium group-hover:text-purple-700 dark:group-hover:text-purple-400">Live Auctions</span>
+            <span className="absolute top-1 right-1 inline-flex items-center justify-center h-4 w-4 rounded-full bg-pink-100 dark:bg-pink-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+              <span className="text-[8px] font-bold text-pink-700 dark:text-pink-300">HOT</span>
+            </span>
           </Button>
         </div>
       </CardContent>

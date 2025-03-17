@@ -1,5 +1,5 @@
 
-import { ArrowRight, Award, ShieldCheck, Clock, Flame } from 'lucide-react';
+import { ArrowRight, Award, ShieldCheck, Clock, Flame, Sparkles } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import { Link } from 'react-router-dom';
 
@@ -46,12 +46,19 @@ const Hero = () => {
               
               <Button 
                 size="lg" 
-                className="bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white shadow-lg group animate-pulse hover:animate-none hover:scale-105 transition-all"
+                className="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-500 to-red-500 hover:from-purple-700 hover:via-pink-600 hover:to-red-600 text-white font-medium shadow-lg group"
                 asChild
               >
                 <Link to="/live-auctions" className="flex items-center">
-                  <Flame className="mr-2 h-5 w-5 text-yellow-200 group-hover:animate-bounce" />
-                  Live Auctions
+                  <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAwIiBoZWlnaHQ9IjIwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZGVmcz48cmFkaWFsR3JhZGllbnQgY3g9IjUwJSIgY3k9IjUwJSIgZng9IjUwJSIgZnk9IjUwJSIgcj0iNTAlIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgaWQ9InBhaW50MF9yYWRpYWwiPjxzdG9wIHN0b3AtY29sb3I9IiNmZmY0IiBvZmZzZXQ9IjAiLz48c3RvcCBzdG9wLWNvbG9yPSIjZmZmMCIgb2Zmc2V0PSIxIi8+PC9yYWRpYWxHcmFkaWVudD48L2RlZnM+PGNpcmNsZSBjeD0iMTAwIiBjeT0iMTAwIiByPSIxMDAiIGZpbGw9InVybCgjcGFpbnQwX3JhZGlhbCkiLz48L3N2Zz4=')] opacity-20 animate-pulse-soft"></div>
+                  <div className="flex items-center relative z-10">
+                    <div className="relative">
+                      <Flame className="mr-2 h-5 w-5 text-yellow-200 animate-pulse-soft" />
+                      <Sparkles className="absolute -top-1 -right-1 h-3 w-3 text-yellow-100 animate-pulse-soft" />
+                    </div>
+                    <span className="mr-2">Live Auctions</span>
+                    <span className="inline-flex items-center justify-center rounded-full bg-white/20 px-1.5 py-0.5 text-xs font-semibold text-white animate-pulse-soft">HOT</span>
+                  </div>
                 </Link>
               </Button>
             </div>
