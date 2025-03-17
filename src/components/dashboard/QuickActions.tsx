@@ -5,7 +5,8 @@ import {
   Settings, 
   Package, 
   BarChart,
-  Download
+  Download,
+  Flame
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +17,19 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const QuickActions = () => {
+  const navigate = useNavigate();
+  
   const handleAction = (action: string) => {
-    toast.success(`${action} action initiated`);
+    switch(action) {
+      case 'Live Auctions':
+        navigate('/live-auctions');
+        break;
+      default:
+        toast.success(`${action} action initiated`);
+    }
   };
 
   return (
@@ -29,7 +39,7 @@ const QuickActions = () => {
         <CardDescription>Common tasks you might want to perform</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-3">
           <Button 
             variant="outline" 
             className="h-auto flex flex-col items-center justify-center py-4 px-2 gap-2 hover:bg-secondary/80" 
@@ -82,6 +92,15 @@ const QuickActions = () => {
           >
             <Download className="h-5 w-5 text-teal-500" />
             <span className="text-xs text-center">Export Data</span>
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="h-auto flex flex-col items-center justify-center py-4 px-2 gap-2 hover:bg-secondary/80 bg-red-50 dark:bg-red-900/20" 
+            onClick={() => handleAction('Live Auctions')}
+          >
+            <Flame className="h-5 w-5 text-red-500" />
+            <span className="text-xs text-center">Live Auctions</span>
           </Button>
         </div>
       </CardContent>

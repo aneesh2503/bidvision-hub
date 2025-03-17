@@ -14,6 +14,7 @@ import AuctionDetails from "./pages/AuctionDetails";
 import AdminProtectedRoute from "./components/AdminProtectedRoute";
 import ExploreAuctions from "./pages/ExploreAuctions";
 import HowItWorksPage from "./pages/HowItWorksPage";
+import LiveAuctions from "./pages/LiveAuctions";
 
 const queryClient = new QueryClient();
 
@@ -36,6 +37,8 @@ const App = () => (
           <Route path="/auction/:id" element={<AuctionDetails />} />
           <Route path="/explore" element={<ExploreAuctions />} />
           <Route path="/how-it-works" element={<HowItWorksPage />} />
+          <Route path="/live-auctions" element={<LiveAuctions />} />
+          <Route path="/live-auctions/:roomId" element={<LiveAuctions />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
